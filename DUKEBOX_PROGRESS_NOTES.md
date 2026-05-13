@@ -22,8 +22,10 @@
 - Found the new app structure under `app/` with a FastAPI backend, backend tests, design guidelines, and frontend dependencies.
 - Renamed visible project identifiers from JukeBox to DukeBox in the FastAPI health response, backend tests, design guidelines, and backend test file name.
 - Added root and app-level `.gitignore` coverage so local dependencies, caches, and secrets do not get swept into the new repo.
+- Imported the original Node.js/Express webapp surface into the DukeBox repo: root `server.js`, `server.ts`, `package.json`, `package-lock.json`, `public/`, `client/`, `src/`, `stitch/`, and related docs/config.
+- Rebranded the imported webapp metadata and visible UI strings to The DukeBox of London.
 
 ## Open Notes
 
 - Confirm whether API compatibility matters before changing endpoint paths. Current endpoints such as `/api/conduct`, `/api/history`, and `/api/vibe-link` do not expose the old brand.
-- Frontend source files were not present outside `node_modules` during initial inspection, so the visible rename work is backend/config/documentation focused for now.
+- The old `.github/workflows/deploy.yml` and `.cpanel.yml` were not imported because they hardcode the previous `jukebox-london` production path. Create fresh DukeBox deployment wiring once the cPanel/GitHub deployment target is confirmed.

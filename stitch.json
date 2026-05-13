@@ -1,0 +1,17 @@
+{
+  "project_name": "The DukeBox of London Legend",
+  "workspace_id": "JB3-LDN-2026-LEGEND",
+  "sync_provider": "github",
+  "repository": "JB3Ai/The-DukeBox-of-London",
+  "design_tokens": "./DESIGN.md",
+  "auto_deploy": true,
+  "environment": {
+    "url": "https://app.jb3ai.com",
+    "mode": "hybrid-cloud"
+  },
+  "permissions": {
+    "ui_modification": "full",
+    "asset_generation": "high-res",
+    "audio_stem_access": true
+  }
+}

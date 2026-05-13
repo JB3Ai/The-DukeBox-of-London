@@ -21,3 +21,7 @@ app/frontend/.cache/
 # OS/editor noise
 .DS_Store
 Thumbs.db
+
+# Logs
+*.log
+npm-debug.log*
