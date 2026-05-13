@@ -1,0 +1,23 @@
+# Local environment and credentials
+.env
+.env.*
+*.env
+credentials.json
+*.pem
+*.key
+.credentials
+
+# Python caches and test output
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.ruff_cache/
+
+# Node dependencies and build caches
+node_modules/
+app/frontend/node_modules/
+app/frontend/.cache/
+
+# OS/editor noise
+.DS_Store
+Thumbs.db

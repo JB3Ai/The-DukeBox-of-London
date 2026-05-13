@@ -1,0 +1,139 @@
+{
+  "project_name": "The DukeBox of London - London Legend Edition",
+  "theme_and_archetype": {
+    "theme": "dark",
+    "primary_archetype": "Archetype 7: Electric & Neon (Cyberpunk/Futuristic)",
+    "secondary_archetype": "Archetype 4: Swiss & High-Contrast (Hardware/Brutalist)",
+    "reasoning": "The DukeBox of London is a premium AI-native electronic music app for professional DJs embedded in UK rave culture. It requires high-energy, dark-mode cyberpunk aesthetics (Archetype 7) combined with the precision and tactile functionality of analog audio hardware (Archetype 4)."
+  },
+  "colors": {
+    "background": {
+      "cyber_peak_bg": "#0A0A0F",
+      "surface_elevated": "#121215",
+      "surface_glass": "rgba(10, 10, 15, 0.6)",
+      "parchment": "#F2E6CE"
+    },
+    "accents": {
+      "hyper_magenta": "#EA00F2",
+      "electric_cyan": "#00E6F2",
+      "mist_blue": "#A7C7E7",
+      "muted_salmon": "#E9967A"
+    },
+    "neutrals": {
+      "border": "#1E1E24",
+      "border_highlight": "rgba(0, 230, 242, 0.2)",
+      "text_primary": "#FFFFFF",
+      "text_secondary": "#8A8A93",
+      "text_muted": "#55555C"
+    },
+    "skins": {
+      "Original Juke": "cyber-retro (Deep black with cyan/magenta)",
+      "Obsidian Matte": "black/crimson (Matte black surfaces, dark red accents)",
+      "Paper": "zine aesthetic (Off-white/parchment background, distressed textures)",
+      "Glass": "frosted (High-blur glassmorphism, ethereal tones)",
+      "Carbon": "CRT green monochrome (Terminal black, neon green phosphor text and borders)"
+    }
+  },
+  "typography": {
+    "display": {
+      "family": "Anton, Impact, sans-serif",
+      "weight": "900",
+      "tracking": "tracking-tighter",
+      "usage": "Display headlines, Phase numbers, Hero text (Mimics Druk Wide Heavy)"
+    },
+    "ui": {
+      "family": "Manrope, Nunito, sans-serif",
+      "weight": "500, 700",
+      "tracking": "tracking-normal",
+      "usage": "General UI, buttons, tabs, navigation (Mimics SF Pro Rounded)"
+    },
+    "editorial": {
+      "family": "Cabinet Grotesk, Inter, sans-serif",
+      "weight": "400, 500",
+      "tracking": "tracking-tight",
+      "usage": "Editorial text, descriptive paragraphs, genre lore (Mimics Neue Montreal)"
+    },
+    "data": {
+      "family": "JetBrains Mono, Space Mono, monospace",
+      "weight": "400",
+      "tracking": "tracking-widest",
+      "usage": "Technical data, BPM, timestamps, audio metadata (Mimics SF Mono)"
+    }
+  },
+  "spacing_and_layout": {
+    "system": "Tailwind 8pt scale (p-2, p-4, p-8, p-12)",
+    "philosophy": "Control Room Grid. Dense, precise, highly structured but with asymmetrical accentuation.",
+    "grids": {
+      "genre_explorer": "Bento Grid (grid-cols-2 md:grid-cols-4 lg:grid-cols-6) with gap-4. Mixed spans for popular genres.",
+      "dashboard": "Asymmetrical layout. Main Phase Selector dial takes col-span-full md:col-span-8, side stats take col-span-4."
+    },
+    "containers": "All functional containers (visualizers, history cards) must have generous internal padding (p-6) with crisp 1px borders."
+  },
+  "surface_strategies": {
+    "genre_cards": {
+      "style": "Glassmorphism (The Crystal Variant)",
+      "classes": "bg-black/60 backdrop-blur-xl border border-white/10 shadow-[0_8px_32px_rgba(0,0,0,0.4)] hover:border-electric-cyan/50 transition-colors"
+    },
+    "now_playing_hardware": {
+      "style": "Retro-Futurism / Tactile Neumorphism",
+      "classes": "bg-[#0A0A0F] border border-[#1E1E24] shadow-[inset_0_1px_0_rgba(255,255,255,0.05)] rounded-lg"
+    },
+    "knobs_and_dials": {
+      "style": "Metallic/Hardware",
+      "classes": "rounded-full bg-gradient-to-b from-[#1a1a24] to-[#0A0A0F] border border-[#2a2a35] shadow-[0_4px_10px_rgba(0,0,0,0.8),inset_0_1px_2px_rgba(255,255,255,0.1)]"
+    }
+  },
+  "motion_and_interactions": {
+    "hover_states": "Hard snaps for hardware buttons. Soft neon glows (drop-shadow-[0_0_8px_rgba(0,230,242,0.5)]) for digital links.",
+    "ai_active": "Pulsing animation using hyper-magenta and electric-cyan. CRT scanline flicker on the visualizer.",
+    "phase_selector": "Smooth rotation with Framer Motion, snapping to 4 distinct phases with haptic-like visual feedback.",
+    "accessibility": "Respect prefers-reduced-motion. High contrast active states."
+  },
+  "components_and_libraries": {
+    "ui_framework": "Shadcn UI (heavily customized for dark mode hardware aesthetic)",
+    "icons": "@phosphor-icons/react (Duotone or Bold weights for a hardware-etched look)",
+    "animations": "framer-motion",
+    "charts": "recharts (for Vault timelines / Vibe Evolution Chart)"
+  },
+  "media_and_images": {
+    "hero_warehouse_bg": {
+      "url": "https://static.prod-images.emergentagent.com/jobs/40927835-a831-4128-88c1-47e2cbe48731/images/1225717e981eebf02addb6f5f6a5efd3873c3057e772c431138f6b1f8984ba4e.png",
+      "description": "Dark moody warehouse rave with cyan and magenta lasers. Use as a low-opacity background for the Dashboard.",
+      "category": "backgrounds"
+    },
+    "rotary_knob_texture": {
+      "url": "https://static.prod-images.emergentagent.com/jobs/40927835-a831-4128-88c1-47e2cbe48731/images/d8f4734f02c26fdfba2072d14158c3a61b62f3d834d39e106bcb416af079e787.png",
+      "description": "High-end brushed aluminum rotary knob. Use as the central Phase Selector dial visual or texture overlay.",
+      "category": "ui_elements"
+    },
+    "genre_abstract_art": {
+      "url": "https://static.prod-images.emergentagent.com/jobs/40927835-a831-4128-88c1-47e2cbe48731/images/62e0502b12f419b26c81e256fd4a59a9d950ec5670b0b9745f658a0be42a4f4f.png",
+      "description": "Fluid glowing glass shapes. Use as thumbnails or hover backgrounds in the Genre Explorer.",
+      "category": "thumbnails"
+    },
+    "crt_waveform": {
+      "url": "https://static.prod-images.emergentagent.com/jobs/40927835-a831-4128-88c1-47e2cbe48731/images/c9e9ff8e6e75e723a4fa308b3675445f4e0f1f28903a5bb3a9d2bec4c77d4c5e.png",
+      "description": "Analog CRT monitor displaying waveforms. Use in the Now Playing visualizer or History/Vault thumbnails.",
+      "category": "visualizations"
+    },
+    "dj_mixer_hardware": {
+      "url": "https://images.pexels.com/photos/12349173/pexels-photo-12349173.jpeg?auto=compress&cs=tinysrgb&dpr=2&h=650&w=940",
+      "description": "Close-up of a DJ mixer in low light. Use for the Settings page background or Skin Switcher preview.",
+      "category": "backgrounds"
+    },
+    "london_underground_sign": {
+      "url": "https://images.unsplash.com/photo-1642538475881-6fd24f7cd161?crop=entropy&cs=srgb&fm=jpg&ixid=M3w4NjY2NzZ8MHwxfHNlYXJjaHwxfHxsb25kb24lMjB1bmRlcmdyb3VuZCUyMHJhdmV8ZW58MHx8fHwxNzc2OTQyNDM5fDA&ixlib=rb-4.1.0&q=85",
+      "description": "Neon underground sign. Use for the 'London Legend Edition' branding elements or welcome screen.",
+      "category": "branding"
+    }
+  },
+  "specific_screen_instructions": {
+    "Global_Nav": "Sticky top bar using 'Crystal Glass' over dark mode (bg-[#0A0A0F]/80 backdrop-blur-xl). Must include 'London Legend Edition' badge in SF Mono.",
+    "Dashboard_Phase_Selector": "Central feature. A massive, tactile rotary wheel. Background is 'cyber-peak-bg'. Use the rotary_knob_texture. Around the dial, show 4 phases (1: Peak Techno, 2: Club Tech, 3: Sunrise, 4: Ambient). The dial dictates the UI accent color.",
+    "Genre_Explorer": "Glassmorphic bento grid. Each genre card uses 'surface_glass' with subtle 'border_highlight' on hover. Text uses 'ui' font. Use 'genre_abstract_art' as a subtle background pattern for featured genres.",
+    "Now_Playing": "Hardware-inspired 'Control Room' interface. Needs bass/treble knobs (rendered via CSS with metallic gradients), a central 'crt_waveform' visualizer, and strict 1px grid borders.",
+    "History_Vault": "Timeline view using 'SF Mono' for timestamps. Show waveform thumbnails. Use muted colors (e.g., 'text_secondary') for past tracks, highlighting the currently playing track in 'hyper-magenta'.",
+    "Settings_and_Skin_Switcher": "A tactile control panel. The skin switcher should be a row of hardware-style toggle buttons or a heavy dropdown, applying different CSS variables based on the skin selected."
+  },
+  "testing_requirements": "All interactive elements (buttons, inputs, sliders, genre cards, phase dial) MUST include a 'data-testid' attribute (e.g., data-testid='phase-selector-dial')."
+}
