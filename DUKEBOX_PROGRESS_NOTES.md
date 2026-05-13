@@ -24,8 +24,10 @@
 - Added root and app-level `.gitignore` coverage so local dependencies, caches, and secrets do not get swept into the new repo.
 - Imported the original Node.js/Express webapp surface into the DukeBox repo: root `server.js`, `server.ts`, `package.json`, `package-lock.json`, `public/`, `client/`, `src/`, `stitch/`, and related docs/config.
 - Rebranded the imported webapp metadata and visible UI strings to The DukeBox of London.
+- Added cPanel Node.js App field guidance to `build.md`, including the recommended app root, startup file, environment mode, passenger log path, and post-pull commands.
 
 ## Open Notes
 
 - Confirm whether API compatibility matters before changing endpoint paths. Current endpoints such as `/api/conduct`, `/api/history`, and `/api/vibe-link` do not expose the old brand.
 - The old `.github/workflows/deploy.yml` and `.cpanel.yml` were not imported because they hardcode the previous `jukebox-london` production path. Create fresh DukeBox deployment wiring once the cPanel/GitHub deployment target is confirmed.
+- Confirm the exact cPanel clone folder. The working assumption is `/home/appjbaic/repositories/The-DukeBox-of-London`, but cPanel may choose a different directory name if the repo was cloned manually.

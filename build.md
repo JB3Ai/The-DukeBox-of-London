@@ -24,6 +24,37 @@ Ensure the following are set in the cPanel Node.js Selector:
 2. Pull updates in cPanel Git Version Control.
 3. Restart Node.js application in cPanel dashboard.
 
+## cPanel Node.js App Settings
+
+Use these values for the DukeBox Node/Express app:
+
+| cPanel field | Value |
+| --- | --- |
+| Node.js version | `20.x` or newer |
+| Application mode | `production` |
+| `NODE_ENV` value | `production` |
+| Application root | `/home/appjbaic/repositories/The-DukeBox-of-London` |
+| Application URL | The domain/subdomain assigned to this app, for example `https://app.jb3ai.com` if that remains the DukeBox app URL |
+| Application startup file | `server.js` |
+| Passenger log file | `/home/appjbaic/logs/dukebox-passenger.log` |
+
+Required environment variables:
+
+| Variable | Value |
+| --- | --- |
+| `GEMINI_API_KEY` | Production Gemini / Google GenAI key from the JB3Ai vault |
+
+After pulling code on cPanel, run dependency installation from the application root, not `/home/appjbaic/`:
+
+```bash
+cd /home/appjbaic/repositories/The-DukeBox-of-London
+npm ci --omit=dev
+mkdir -p tmp
+touch tmp/restart.txt
+```
+
+If cPanel creates the app under a different folder name, use that exact folder for `Application root` and the `cd` command. Do not use `/home/appjbaic/` as the application root unless the repo files (`package.json`, `server.js`, and `public/`) are directly inside `/home/appjbaic/`.
+
 ---
 
 # 🛠️ DukeBox Build & Deploy Guide
