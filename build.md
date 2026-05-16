@@ -72,3 +72,31 @@ git add .
 git commit -m "update: refining the London Legend logic"
 git push origin main
 ```
+
+## Morning Action Checklist - May 16, 2026
+
+Milestone 2 local work was prepared on May 15, 2026 in:
+- `public/index.html`
+- `public/globals.css`
+- `public/app.js`
+
+When you return to VS Code on Saturday, May 16, 2026:
+
+1. Review the local milestone 2 changes for the full 51 sub-genre flow.
+2. Commit and push them:
+   ```bash
+   git add public/index.html public/globals.css public/app.js
+   git commit -m "feat: complete milestone 2 genre matrix and selectors"
+   git push origin main
+   ```
+3. In cPanel, pull the latest `main` branch changes.
+4. Restart the Node.js application:
+   ```bash
+   cd /home/appjbaic/repositories/The-DukeBox-of-London
+   touch tmp/restart.txt
+   ```
+
+Original implementation checklist for reference:
+1. Paste Step A into `public/index.html`.
+2. Append Step B styles into `public/globals.css`.
+3. Replace the navigation/state logic in `public/app.js` with Step C.

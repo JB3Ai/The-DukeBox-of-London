@@ -1,40 +1,74 @@
-const phaseCards = Array.from(document.querySelectorAll('.phase-card'));
-const phaseWheel = document.querySelector('#phase-wheel');
-const phaseReadout = document.querySelector('#phase-readout');
-const form = document.querySelector('#conductor-form');
-const statusLine = document.querySelector('#status-line');
-const audioEl = document.querySelector('#generated-audio');
-const lyricsEl = document.querySelector('#lyrics');
-const phaseChip = document.querySelector('#phase-chip');
-const historyList = document.querySelector('#session-history');
-const historyExportBtn = document.querySelector('#history-export');
-const historyShareBtn = document.querySelector('#history-share');
-const waveformEl = document.querySelector('#waveform-visualizer');
-const neuralHandshakeBtn = document.querySelector('#neural-handshake-btn');
-const handshakeStatus = document.querySelector('#handshake-status');
-const playbackPanel = document.querySelector('.playback');
-const neuralMesh = document.querySelector('#neural-mesh');
-const lyricsStream = document.querySelector('#lyrics-stream');
+// --- STATE MANAGEMENT ARCHITECTURE ---
+let selectedPhaseCode = 1;
+let selectedGenreCode = null;
+let selectedAtmosphere = 'dark';
+let selectedVocalStyle = 'off';
+let currentBpm = 136;
+let waveAnimationFrame = null;
+let meshTime = 0;
 
-const HISTORY_KEY = 'dukebox-session-history-v1';
-const MAX_HISTORY_ITEMS = 5;
-const WAVE_BAR_COUNT = 28;
-const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-const phaseMeta = {
-  'PEAK-BASS': { key: 'peak-bass', label: 'Peak-Bass', bpm: 136, angle: -135 },
-  'MAIN-FLOOR': { key: 'main-floor', label: 'Main-Floor', bpm: 128, angle: -45 },
-  SUNRISE: { key: 'sunrise', label: 'Sunrise', bpm: 118, angle: 45 },
-  'ZONED-OUT': { key: 'zoned-out', label: 'Zoned-Out', bpm: 92, angle: 135 },
+// Phase Parameters Master Configuration (Design Spec Reference)
+const phaseMap = {
+  1: { name: 'PEAK-BASS', key: 'peak-bass', minBpm: 140, maxBpm: 180, defaultBpm: 150 },
+  2: { name: 'MAIN-FLOOR', key: 'main-floor', minBpm: 120, maxBpm: 140, defaultBpm: 128 },
+  3: { name: 'SUNRISE', key: 'sunrise', minBpm: 100, maxBpm: 128, defaultBpm: 118 },
+  4: { name: 'ZONED-OUT', key: 'zoned-out', minBpm: 60, maxBpm: 100, defaultBpm: 80 },
 };
-const phaseOrder = ['PEAK-BASS', 'MAIN-FLOOR', 'SUNRISE', 'ZONED-OUT'];
 
-let selectedPhase = 'PEAK-BASS';
-let isGenerating = false;
-let waveInterval = null;
-let isDraggingWheel = false;
-let isWaveAnimating = false;
-let meshAnimationFrame = null;
-let meshPulse = 0;
+// Hardcoded Local Mirror of the 51-Genre Data Model for instantaneous UI layout
+const genreMatrix = [
+  { code: 'B-01', name: 'Peak Hour Techno', phase: 1, bpm: [145, 160] },
+  { code: 'B-02', name: 'Neurofunk', phase: 1, bpm: [170, 180] },
+  { code: 'B-03', name: 'Hard Techno', phase: 1, bpm: [150, 165] },
+  { code: 'B-04', name: 'Bass House', phase: 1, bpm: [125, 135] },
+  { code: 'B-05', name: 'Dubstep (Riddim)', phase: 1, bpm: [140, 150] },
+  { code: 'B-06', name: 'Dubstep (OG)', phase: 1, bpm: [138, 142] },
+  { code: 'B-07', name: 'Brostep', phase: 1, bpm: [140, 150] },
+  { code: 'B-08', name: 'Jungle', phase: 1, bpm: [160, 180] },
+  { code: 'B-09', name: 'Drumstep', phase: 1, bpm: [165, 175] },
+  { code: 'B-10', name: 'Acid Techno', phase: 1, bpm: [140, 155] },
+  { code: 'B-11', name: 'Psytrance', phase: 1, bpm: [138, 150] },
+  { code: 'B-12', name: 'Ghetto House / Juke', phase: 1, bpm: [155, 165] },
+  { code: 'B-13', name: 'Hardstyle', phase: 1, bpm: [150, 160] },
+  { code: 'H-13', name: 'Deep House', phase: 2, bpm: [120, 125] },
+  { code: 'H-14', name: 'Tech House', phase: 2, bpm: [124, 130] },
+  { code: 'M-15', name: 'Minimal Techno', phase: 2, bpm: [128, 135] },
+  { code: 'M-16', name: 'Melodic Techno', phase: 2, bpm: [122, 132] },
+  { code: 'G-17', name: 'UK Garage (2-Step)', phase: 2, bpm: [130, 140] },
+  { code: 'G-18', name: 'Bassline', phase: 2, bpm: [130, 140] },
+  { code: 'H-19', name: 'Progressive House', phase: 2, bpm: [126, 132] },
+  { code: 'H-20', name: 'Afro House', phase: 2, bpm: [120, 128] },
+  { code: 'H-21', name: 'Amapiano', phase: 2, bpm: [110, 120] },
+  { code: 'H-22', name: "Jackin' House", phase: 2, bpm: [124, 130] },
+  { code: 'D-23', name: 'Nu-Disco', phase: 2, bpm: [118, 126] },
+  { code: 'D-24', name: 'Italo Disco', phase: 2, bpm: [118, 125] },
+  { code: 'D-25', name: 'Liquid D&B', phase: 2, bpm: [170, 178] },
+  { code: 'O-26', name: 'Organic House', phase: 3, bpm: [118, 124] },
+  { code: 'O-27', name: 'Microhouse', phase: 3, bpm: [120, 130] },
+  { code: 'O-28', name: 'Balearic Beat', phase: 3, bpm: [100, 118] },
+  { code: 'O-29', name: 'Breakbeat', phase: 3, bpm: [120, 140] },
+  { code: 'O-30', name: 'French House', phase: 3, bpm: [120, 128] },
+  { code: 'O-31', name: 'Electro (Detroit)', phase: 3, bpm: [125, 135] },
+  { code: 'O-32', name: 'Future Garage', phase: 3, bpm: [130, 140] },
+  { code: 'O-33', name: 'Leftfield House', phase: 3, bpm: [118, 128] },
+  { code: 'O-34', name: 'Dub Techno', phase: 3, bpm: [120, 130] },
+  { code: 'L-35', name: 'Lo-Fi House', phase: 3, bpm: [115, 125] },
+  { code: 'A-36', name: 'Trip-Hop', phase: 4, bpm: [70, 100] },
+  { code: 'A-37', name: 'Downtempo', phase: 4, bpm: [80, 110] },
+  { code: 'A-38', name: 'Lo-Fi Hip Hop', phase: 4, bpm: [70, 90] },
+  { code: 'A-39', name: 'Ambient Dub', phase: 4, bpm: [60, 90] },
+  { code: 'A-40', name: 'Chillwave', phase: 4, bpm: [80, 110] },
+  { code: 'A-41', name: 'Vaporwave', phase: 4, bpm: [60, 100] },
+  { code: 'A-42', name: 'Psybient', phase: 4, bpm: [80, 120] },
+  { code: 'A-43', name: 'IDM', phase: 4, bpm: [100, 140] },
+  { code: 'A-44', name: 'Folktronica', phase: 4, bpm: [80, 120] },
+  { code: 'A-45', name: 'Glitch-Hop', phase: 4, bpm: [90, 110] },
+  { code: 'A-46', name: 'Ethereal Wave', phase: 4, bpm: [80, 120] },
+  { code: 'A-47', name: 'Dark Ambient', phase: 4, bpm: [60, 80] },
+  { code: 'A-48', name: 'Illbient', phase: 4, bpm: [60, 90] },
+  { code: 'A-49', name: 'Space Music', phase: 4, bpm: [60, 80] },
+  { code: 'A-50', name: 'Post-Classical', phase: 4, bpm: [60, 90] },
+];
 
 const safeVibrate = (pattern) => {
   if ('vibrate' in navigator && typeof navigator.vibrate === 'function') {
@@ -42,533 +76,209 @@ const safeVibrate = (pattern) => {
   }
 };
 
-const getHistory = () => {
-  try {
-    const parsed = JSON.parse(localStorage.getItem(HISTORY_KEY) || '[]');
-    return Array.isArray(parsed) ? parsed : [];
-  } catch {
-    return [];
-  }
-};
-
-const setHistory = (entries) => {
-  localStorage.setItem(HISTORY_KEY, JSON.stringify(entries.slice(0, MAX_HISTORY_ITEMS)));
-};
-
-const saveSessionEntry = ({ phase, atmosphere, artistSeed }) => {
-  const nextHistory = [
-    {
-      phase: phaseMeta[phase]?.label || phase,
-      atmosphere,
-      artistSeed,
-      timestamp: Date.now(),
-    },
-    ...getHistory(),
-  ];
-  setHistory(nextHistory);
-  renderHistory();
-};
-
-const renderHistory = () => {
-  if (!historyList) return;
-
-  const history = getHistory();
-  historyList.replaceChildren();
-
-  if (history.length === 0) {
-    const empty = document.createElement('li');
-    empty.className = 'history-empty';
-    empty.textContent = 'No sets generated yet.';
-    historyList.appendChild(empty);
-    return;
-  }
-
-  history.forEach((entry) => {
-    const li = document.createElement('li');
-    const when = new Date(entry.timestamp).toLocaleTimeString([], {
-      hour: '2-digit',
-      minute: '2-digit',
-    });
-    li.textContent = `${entry.phase} | ${entry.atmosphere} | seed: ${entry.artistSeed} | ${when}`;
-    historyList.appendChild(li);
-  });
-};
-
-const drawNeuralMesh = () => {
-  if (!neuralMesh) return;
-
-  const context = neuralMesh.getContext('2d');
-  if (!context) return;
-
-  const rect = neuralMesh.getBoundingClientRect();
-  const ratio = window.devicePixelRatio || 1;
-  const width = Math.max(1, Math.floor(rect.width * ratio));
-  const height = Math.max(1, Math.floor(rect.height * ratio));
-
-  if (neuralMesh.width !== width || neuralMesh.height !== height) {
-    neuralMesh.width = width;
-    neuralMesh.height = height;
-  }
-
-  context.clearRect(0, 0, width, height);
-  context.lineWidth = 1 * ratio;
-  context.globalCompositeOperation = 'screen';
-
-  const time = prefersReducedMotion ? 0 : performance.now() / 800;
-  const columns = 7;
-  const rows = 4;
-  const points = [];
-
-  for (let row = 0; row < rows; row += 1) {
-    for (let column = 0; column < columns; column += 1) {
-      const x = (column / (columns - 1)) * width;
-      const y = (row / (rows - 1)) * height;
-      const drift = Math.sin(time + column * 0.8 + row * 1.4) * 8 * ratio * meshPulse;
-      points.push({ x: x + drift, y: y - drift * 0.45 });
-    }
-  }
-
-  points.forEach((point, index) => {
-    const next = index % columns === columns - 1 ? null : points[index + 1];
-    const below = points[index + columns];
-    const alpha = 0.16 + meshPulse * 0.34;
-    context.strokeStyle = `rgba(0, 230, 242, ${alpha})`;
-
-    [next, below].forEach((target) => {
-      if (!target) return;
-      context.beginPath();
-      context.moveTo(point.x, point.y);
-      context.lineTo(target.x, target.y);
-      context.stroke();
-    });
-
-    context.fillStyle = `rgba(234, 0, 242, ${0.22 + meshPulse * 0.48})`;
-    context.beginPath();
-    context.arc(point.x, point.y, (1.2 + meshPulse * 1.8) * ratio, 0, Math.PI * 2);
-    context.fill();
-  });
-};
-
-const syncMeshAnimationState = () => {
-  drawNeuralMesh();
-
-  if (prefersReducedMotion || meshAnimationFrame || !isWaveAnimating) return;
-
-  const tick = () => {
-    meshPulse = isWaveAnimating ? Math.min(1, meshPulse + 0.06) : Math.max(0, meshPulse - 0.08);
-    drawNeuralMesh();
-
-    if (isWaveAnimating || meshPulse > 0) {
-      meshAnimationFrame = requestAnimationFrame(tick);
-      return;
-    }
-
-    meshAnimationFrame = null;
-  };
-
-  meshAnimationFrame = requestAnimationFrame(tick);
-};
-
-const syncWaveAnimationState = () => {
-  const shouldAnimate = isGenerating || Boolean(audioEl?.src && !audioEl?.paused);
-  if (shouldAnimate === isWaveAnimating) return;
-  isWaveAnimating = shouldAnimate;
-  syncMeshAnimationState();
-
-  if (isWaveAnimating && !waveInterval) {
-    waveInterval = setInterval(updateWaveform, 150);
-  }
-
-  if (!isWaveAnimating && waveInterval) {
-    clearInterval(waveInterval);
-    waveInterval = null;
-  }
-};
-
-const updateWaveform = () => {
-  if (!waveformEl) return;
-  const bars = Array.from(waveformEl.children);
-  const active = isWaveAnimating;
-  waveformEl.classList.toggle('is-active', active);
-
-  bars.forEach((bar) => {
-    const min = active ? 24 : 12;
-    const max = active ? 98 : 20;
-    bar.style.height = `${Math.floor(min + Math.random() * (max - min))}%`;
-  });
-};
-
-const ensureWaveformBars = () => {
-  if (!waveformEl) return;
-  waveformEl.replaceChildren();
-  for (let i = 0; i < WAVE_BAR_COUNT; i += 1) {
-    const bar = document.createElement('span');
-    bar.className = 'wave-bar';
-    waveformEl.appendChild(bar);
-  }
-  updateWaveform();
-};
-
-const circularDistance = (a, b) => {
-  const delta = Math.abs(a - b);
-  return Math.min(delta, 360 - delta);
-};
-
-const closestPhaseFromAngle = (angle) => {
-  let winner = phaseOrder[0];
-  let smallest = Number.POSITIVE_INFINITY;
-
-  phaseOrder.forEach((phase) => {
-    const distance = circularDistance(angle, phaseMeta[phase].angle);
-    if (distance < smallest) {
-      smallest = distance;
-      winner = phase;
-    }
+function showScreen(screenId) {
+  document.querySelectorAll('.app-screen').forEach((screen) => {
+    screen.classList.remove('active');
+    screen.classList.add('hidden');
   });
 
-  return winner;
-};
+  const target = document.getElementById(screenId);
+  if (!target) return;
+  target.classList.remove('hidden');
+  target.classList.add('active');
+}
 
-const angleFromPointer = (event) => {
-  if (!phaseWheel) return phaseMeta[selectedPhase].angle;
-  const rect = phaseWheel.getBoundingClientRect();
-  const centerX = rect.left + rect.width / 2;
-  const centerY = rect.top + rect.height / 2;
-  const dx = event.clientX - centerX;
-  const dy = event.clientY - centerY;
-  return (Math.atan2(dy, dx) * 180) / Math.PI;
-};
+function syncPhaseTheme(cfg) {
+  document.body.dataset.phase = cfg.key;
 
-const syncPhaseCards = (phase) => {
-  phaseCards.forEach((card) => {
-    card.classList.toggle('is-current', card.dataset.phase === phase);
-  });
-};
-
-const applyPhaseTheme = (phase) => {
-  const meta = phaseMeta[phase];
-  if (!meta) return;
-
-  selectedPhase = phase;
-  document.body.dataset.phase = meta.key;
-  syncPhaseCards(phase);
-
+  const phaseChip = document.getElementById('phase-chip');
   if (phaseChip) {
-    phaseChip.textContent = `${meta.label} · ${meta.bpm} BPM`;
-  }
-  if (phaseReadout) {
-    phaseReadout.textContent = meta.label;
-  }
-  if (phaseWheel) {
-    phaseWheel.style.setProperty('--wheel-angle', `${meta.angle}deg`);
-    phaseWheel.setAttribute('aria-valuenow', `${phaseOrder.indexOf(phase) + 1}`);
-    phaseWheel.setAttribute('aria-valuetext', meta.label);
-  }
-  if (!isGenerating) {
-    statusLine.textContent = `${meta.label} phase armed.`;
-  }
-};
-
-const enterBooth = async () => {
-  if (isGenerating) return;
-
-  const atmosphere = '140BPM London warehouse neural buffer';
-  const artistSeed = 'London club lineage';
-  const defaultLabel = neuralHandshakeBtn?.textContent || 'Enter Booth';
-
-  if (neuralHandshakeBtn) {
-    neuralHandshakeBtn.textContent = 'SYNCING...';
-    neuralHandshakeBtn.disabled = true;
-  }
-  if (handshakeStatus) {
-    handshakeStatus.textContent = 'INITIALIZING NEURAL BUFFER...';
-  }
-  if (statusLine) {
-    statusLine.textContent = 'Neural handshake in progress...';
+    phaseChip.innerText = `${cfg.name} · ${cfg.defaultBpm} BPM`;
   }
 
-  isGenerating = true;
-  syncWaveAnimationState();
-  updateWaveform();
+  document.querySelectorAll('.phase-card').forEach((card) => {
+    card.classList.toggle('is-current', card.dataset.phase === cfg.name);
+  });
+}
+
+// Action: User maps quadrant based on code integers
+function selectPhase(phaseCode) {
+  selectedPhaseCode = parseInt(phaseCode, 10) || 1;
+  if (phaseCode === 'PEAK-BASS') selectedPhaseCode = 1;
+  if (phaseCode === 'MAIN-FLOOR') selectedPhaseCode = 2;
+  if (phaseCode === 'SUNRISE') selectedPhaseCode = 3;
+  if (phaseCode === 'ZONED-OUT') selectedPhaseCode = 4;
+
+  const cfg = phaseMap[selectedPhaseCode];
+  syncPhaseTheme(cfg);
+
+  document.getElementById('selected-phase-title').innerText = `PHASE ${selectedPhaseCode}: ${cfg.name}`;
+  document.getElementById('phase-meta-readout').innerText = `${cfg.defaultBpm} BPM STANDARD`;
+
+  const slider = document.getElementById('bpm-slider');
+  slider.min = cfg.minBpm;
+  slider.max = cfg.maxBpm;
+  slider.value = cfg.defaultBpm;
+  updateBpmReadout(cfg.defaultBpm);
+
+  document.getElementById('slider-min-label').innerText = `${cfg.minBpm} BPM`;
+  document.getElementById('slider-max-label').innerText = `${cfg.maxBpm} BPM`;
+
+  populateGenres(selectedPhaseCode);
+  safeVibrate(15);
+  showScreen('screen-refine');
+}
+
+function populateGenres(phaseCode) {
+  const container = document.getElementById('genre-bento-grid');
+  container.innerHTML = '';
+  selectedGenreCode = null;
+
+  const targeted = genreMatrix.filter((genre) => genre.phase === phaseCode);
+  targeted.forEach((genre) => {
+    const el = document.createElement('div');
+    el.className = 'genre-card';
+    el.id = `genre-card-${genre.code}`;
+    el.innerHTML = `
+      <h4>${genre.name}</h4>
+      <span>CODE: ${genre.code} [${genre.bpm[0]}-${genre.bpm[1]} BPM]</span>
+    `;
+    el.onclick = () => setGenreSelection(genre.code, genre.bpm[0]);
+    container.appendChild(el);
+  });
+}
+
+function setGenreSelection(code, minBpm) {
+  document.querySelectorAll('.genre-card').forEach((card) => card.classList.remove('selected'));
+  const card = document.getElementById(`genre-card-${code}`);
+  if (card) card.classList.add('selected');
+  selectedGenreCode = code;
+
+  const slider = document.getElementById('bpm-slider');
+  slider.value = minBpm;
+  updateBpmReadout(minBpm);
+  safeVibrate(10);
+}
+
+function setAtmosphere(value) {
+  setActiveSegment('atmosphere-control', value);
+  selectedAtmosphere = value;
+}
+
+function setVocal(value) {
+  setActiveSegment('vocal-control', value);
+  selectedVocalStyle = value === 'off' ? null : value;
+}
+
+function setActiveSegment(containerId, valueText) {
+  const container = document.getElementById(containerId);
+  if (!container) return;
+
+  container.querySelectorAll('.seg-btn').forEach((button) => {
+    button.classList.remove('active');
+    if (button.innerText.toLowerCase().includes(valueText.toLowerCase())) {
+      button.classList.add('active');
+    }
+  });
+}
+
+function updateBpmReadout(value) {
+  currentBpm = parseInt(value, 10);
+  document.getElementById('bpm-readout').innerText = `${value} BPM`;
+}
+
+// Upgraded API Request Engine passing perfect architectural payload maps
+async function startConducting() {
+  const btn = document.querySelector('.master-btn');
+  const lyricsStream = document.getElementById('lyrics-stream');
+  const cfg = phaseMap[selectedPhaseCode];
+
+  btn.innerText = 'SYNCING NEURAL BUFFER...';
+  btn.style.opacity = '0.5';
+
+  showScreen('screen-cockpit');
+  lyricsStream.innerText = `Assembling Latent Seed Generator... [Phase: ${selectedPhaseCode}]`;
 
   try {
     const response = await fetch('/api/conduct', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
-        phase: selectedPhase,
-        atmosphere,
-        artistSeed,
+        phase: cfg.name,
+        phase_code: selectedPhaseCode,
+        atmosphere: selectedAtmosphere,
+        bpm: currentBpm,
+        vocal_style: selectedVocalStyle,
+        genre_code: selectedGenreCode,
+        artistSeed: 'London Legacy Workspace Engine',
+        artist_seed: 'London Legacy Workspace Engine',
       }),
     });
-    const payload = await response.json();
 
-    if (!response.ok) {
-      throw new Error(payload?.message || payload?.error || 'Neural handshake failed.');
-    }
+    const payload = await response.json();
+    if (!response.ok) throw new Error(payload?.error || 'Generation failed');
 
     const inlineData = payload?.audioData;
     const data = inlineData?.data || '';
     const mimeType = inlineData?.mimeType || 'audio/wav';
 
-    if (data && audioEl) {
+    if (data) {
+      const audioEl = document.getElementById('generated-audio');
       audioEl.src = `data:${mimeType};base64,${data}`;
-      await audioEl.play().catch(() => null);
-    }
-    if (payload?.lyrics && lyricsEl) {
-      lyricsEl.textContent = payload.lyrics;
-    }
-    if (lyricsStream) {
-      lyricsStream.textContent = payload?.lyrics || 'Synthesizing next movement...';
-    }
-    if (playbackPanel) {
-      playbackPanel.classList.add('is-synced');
-      window.setTimeout(() => playbackPanel.classList.remove('is-synced'), 1400);
+      await audioEl.play().catch(() => console.log('Autoplay deferred'));
     }
 
-    saveSessionEntry({ phase: selectedPhase, atmosphere, artistSeed });
+    if (payload?.name) document.getElementById('active-track').innerText = payload.name;
+    lyricsStream.innerText = payload.lyrics || 'Neural Sync Complete. Playback Active.';
     safeVibrate([18, 32, 18]);
-
-    if (handshakeStatus) {
-      handshakeStatus.innerHTML = '<strong>SYNCED:</strong> Ready to conduct.';
-    }
-    if (statusLine) {
-      statusLine.textContent = data ? 'Neural sync complete. Playback armed.' : 'Neural sync complete.';
-    }
-    if (neuralHandshakeBtn) {
-      neuralHandshakeBtn.textContent = 'Start Session';
-    }
   } catch (error) {
-    if (handshakeStatus) {
-      handshakeStatus.textContent = 'CONNECTION ERROR: Check server logs.';
-    }
-    if (statusLine) {
-      statusLine.textContent = error.message || 'Connection error.';
-    }
-    if (neuralHandshakeBtn) {
-      neuralHandshakeBtn.textContent = 'Retry Sync';
-    }
+    lyricsStream.innerText = `TRANSMISSION ERROR: ${error.message}`;
   } finally {
-    isGenerating = false;
-    if (neuralHandshakeBtn) {
-      neuralHandshakeBtn.disabled = false;
-    }
-    syncWaveAnimationState();
-    updateWaveform();
+    btn.innerText = 'CONDUCTING VIBE...';
+    btn.style.opacity = '1';
   }
-};
+}
 
-window.enterBooth = enterBooth;
+// Placeholder Visualizer Thread mapping Canvas loop
+const canvas = document.getElementById('neural-mesh');
+const ctx = canvas?.getContext('2d');
 
-const movePhaseByStep = (delta) => {
-  const current = phaseOrder.indexOf(selectedPhase);
-  const next = (current + delta + phaseOrder.length) % phaseOrder.length;
-  applyPhaseTheme(phaseOrder[next]);
-};
+function drawMesh() {
+  if (!canvas || !ctx) return;
 
-phaseCards.forEach((card) => {
-  card.addEventListener('click', () => {
-    const nextPhase = card.dataset.phase || selectedPhase;
-    applyPhaseTheme(nextPhase);
-    safeVibrate([12, 30, 12]);
-  });
+  const width = canvas.clientWidth;
+  const height = canvas.clientHeight;
+  if (canvas.width !== width || canvas.height !== height) {
+    canvas.width = width;
+    canvas.height = height;
+  }
+
+  ctx.clearRect(0, 0, width, height);
+  ctx.strokeStyle = 'rgba(0, 230, 242, 0.3)';
+  ctx.beginPath();
+  for (let i = 0; i < width; i += 15) {
+    ctx.moveTo(i, height / 2 + Math.sin(meshTime + i * 0.05) * 15);
+    ctx.lineTo(i + 15, height / 2 + Math.sin(meshTime + (i + 15) * 0.05) * 15);
+  }
+  ctx.stroke();
+  meshTime += 0.04;
+  waveAnimationFrame = requestAnimationFrame(drawMesh);
+}
+
+document.querySelectorAll('.phase-card').forEach((card) => {
+  card.addEventListener('click', () => selectPhase(card.dataset.phase));
 });
 
-if (phaseWheel) {
-  const handlePointerMove = (event) => {
-    if (!isDraggingWheel) return;
-    const angle = angleFromPointer(event);
-    applyPhaseTheme(closestPhaseFromAngle(angle));
-  };
+window.showScreen = showScreen;
+window.selectPhase = selectPhase;
+window.setAtmosphere = setAtmosphere;
+window.setVocal = setVocal;
+window.updateBpmReadout = updateBpmReadout;
+window.startConducting = startConducting;
 
-  phaseWheel.addEventListener('pointerdown', (event) => {
-    phaseWheel.setPointerCapture(event.pointerId);
-    isDraggingWheel = true;
-    handlePointerMove(event);
-    safeVibrate(12);
-  });
+syncPhaseTheme(phaseMap[selectedPhaseCode]);
+drawMesh();
 
-  phaseWheel.addEventListener('pointermove', handlePointerMove);
-  phaseWheel.addEventListener('pointerup', () => {
-    isDraggingWheel = false;
-  });
-  phaseWheel.addEventListener('pointercancel', () => {
-    isDraggingWheel = false;
-  });
-
-  phaseWheel.addEventListener('keydown', (event) => {
-    if (event.key === 'ArrowLeft' || event.key === 'ArrowDown') {
-      event.preventDefault();
-      movePhaseByStep(-1);
-      safeVibrate(10);
-    }
-    if (event.key === 'ArrowRight' || event.key === 'ArrowUp') {
-      event.preventDefault();
-      movePhaseByStep(1);
-      safeVibrate(10);
-    }
-  });
-}
-
-ensureWaveformBars();
-drawNeuralMesh();
-renderHistory();
-applyPhaseTheme(selectedPhase);
-
-window.addEventListener('resize', drawNeuralMesh);
-
-if (historyExportBtn) {
-  historyExportBtn.addEventListener('click', () => {
-    const history = getHistory();
-    if (history.length === 0) {
-      statusLine.textContent = 'No session history to export yet.';
-      return;
-    }
-
-    const blob = new Blob([JSON.stringify(history, null, 2)], { type: 'application/json' });
-    const url = URL.createObjectURL(blob);
-    const link = document.createElement('a');
-    link.href = url;
-    link.download = `dukebox-session-${new Date().toISOString().slice(0, 19).replace(/[:T]/g, '-')}.json`;
-    document.body.appendChild(link);
-    link.click();
-    link.remove();
-    URL.revokeObjectURL(url);
-    statusLine.textContent = 'Session history exported.';
-  });
-}
-
-if (historyShareBtn) {
-  historyShareBtn.addEventListener('click', async () => {
-    const history = getHistory();
-    if (history.length === 0) {
-      statusLine.textContent = 'No session history to share yet.';
-      return;
-    }
-
-    const summary = history
-      .map((entry, index) => `${index + 1}. ${entry.phase} | ${entry.atmosphere} | ${entry.artistSeed}`)
-      .join('\n');
-    const shareText = `The DukeBox of London Session\n${summary}`;
-
-    try {
-      if (navigator.share) {
-        await navigator.share({
-          title: 'The DukeBox of London Session',
-          text: shareText,
-        });
-        statusLine.textContent = 'Session summary shared.';
-      } else if (navigator.clipboard?.writeText) {
-        await navigator.clipboard.writeText(shareText);
-        statusLine.textContent = 'Session summary copied to clipboard.';
-      } else {
-        statusLine.textContent = 'Share not supported in this browser.';
-      }
-    } catch {
-      statusLine.textContent = 'Share canceled.';
-    }
-  });
-}
-
-if (audioEl) {
-  audioEl.addEventListener('play', () => {
-    syncWaveAnimationState();
-    updateWaveform();
-  });
-  audioEl.addEventListener('pause', () => {
-    syncWaveAnimationState();
-    updateWaveform();
-  });
-  audioEl.addEventListener('ended', () => {
-    syncWaveAnimationState();
-    updateWaveform();
-  });
-}
-
-if (form) {
-  form.addEventListener('submit', async (event) => {
-    event.preventDefault();
-
-    const atmosphere = document.querySelector('#atmosphere')?.value?.trim();
-    const artistSeed = document.querySelector('#artistSeed')?.value?.trim();
-
-    if (!atmosphere || !artistSeed) {
-      statusLine.textContent = 'Add both atmosphere and artist seed.';
-      return;
-    }
-
-    statusLine.textContent = 'Generating AI stream...';
-    isGenerating = true;
-    syncWaveAnimationState();
-    updateWaveform();
-
-    try {
-      const response = await fetch('/api/conduct', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          phase: selectedPhase,
-          atmosphere,
-          artistSeed,
-        }),
-      });
-
-      const payload = await response.json();
-
-      if (!response.ok) {
-        throw new Error(payload?.message || payload?.error || 'Generation failed');
-      }
-
-      const inlineData = payload?.audioData;
-      const data = inlineData?.data || '';
-      const mimeType = inlineData?.mimeType || 'audio/wav';
-
-      if (data) {
-        audioEl.src = `data:${mimeType};base64,${data}`;
-        await audioEl.play().catch(() => null);
-      }
-
-      if (payload?.lyrics) {
-        lyricsEl.textContent = payload.lyrics;
-      }
-      if (lyricsStream) {
-        lyricsStream.textContent = payload?.lyrics || 'Synthesizing next movement...';
-      }
-      if (playbackPanel) {
-        playbackPanel.classList.add('is-synced');
-        window.setTimeout(() => playbackPanel.classList.remove('is-synced'), 1400);
-      }
-
-      saveSessionEntry({ phase: selectedPhase, atmosphere, artistSeed });
-
-      safeVibrate([20, 36, 20]);
-      statusLine.textContent = 'Stream generated. Playback started.';
-    } catch (error) {
-      statusLine.textContent = error.message || 'Generation failed.';
-    } finally {
-      isGenerating = false;
-      syncWaveAnimationState();
-      updateWaveform();
-    }
-  });
-}
-
-document.addEventListener('visibilitychange', () => {
-  if (document.hidden) {
-    isWaveAnimating = false;
-    if (meshAnimationFrame) {
-      cancelAnimationFrame(meshAnimationFrame);
-      meshAnimationFrame = null;
-    }
-    meshPulse = 0;
-    if (waveInterval) {
-      clearInterval(waveInterval);
-      waveInterval = null;
-    }
-    updateWaveform();
-    drawNeuralMesh();
-    return;
-  }
-  syncWaveAnimationState();
-  updateWaveform();
+window.addEventListener('beforeunload', () => {
+  if (waveAnimationFrame) cancelAnimationFrame(waveAnimationFrame);
 });
