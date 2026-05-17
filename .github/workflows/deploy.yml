@@ -44,9 +44,6 @@ jobs:
             git fetch origin main
             git reset --hard origin/main
 
-            # Activate your dedicated Node virtual environment
-            source /home/${{ secrets.DEPLOY_USER }}/nodevenv/repositories/The-DukeBox-of-London/24/bin/activate || source /home/${{ secrets.DEPLOY_USER }}/nodevenv/repositories/The-DukeBox-of-London/20/bin/activate
-
             # Install clean production dependencies bypassing compiler noise
             npm ci --omit=dev
 
