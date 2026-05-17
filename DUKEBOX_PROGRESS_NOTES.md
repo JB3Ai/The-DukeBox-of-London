@@ -38,6 +38,7 @@
 - Chose the bridge path before any direct Python canonical migration: keep the active Node/Lyria deployment working while preparing for the richer FastAPI contract.
 - Replaced `public/app.js` with a bilingual matrix engine that preserves the 51-genre frontend layout, sends the current Node payload first, and retries with the FastAPI integer-phase payload only after a `422` validation response.
 - Normalized the Phase 1 default BPM back inside its allowed range so the initial slider state stays valid.
+- Added a fresh DukeBox-specific `.cpanel.yml` so cPanel Git Version Control can deploy `main`, install production dependencies, and restart Passenger without relying on Terminal access.
 
 ## Open Notes
 

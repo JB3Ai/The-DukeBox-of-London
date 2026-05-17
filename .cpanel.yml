@@ -1,0 +1,7 @@
+---
+deployment:
+  tasks:
+    - /bin/echo "Deploying The DukeBox of London from /home/appjbaic/repositories/The-DukeBox-of-London"
+    - cd /home/appjbaic/repositories/The-DukeBox-of-London && npm ci --omit=dev
+    - /bin/mkdir -p /home/appjbaic/repositories/The-DukeBox-of-London/tmp
+    - /usr/bin/touch /home/appjbaic/repositories/The-DukeBox-of-London/tmp/restart.txt
