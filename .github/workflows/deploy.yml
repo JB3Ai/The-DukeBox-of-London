@@ -1,0 +1,58 @@
+name: Deploy The DukeBox of London to Production
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Repository Code
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js Environment
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+
+      - name: Install Development Dependencies and Verify Local Build
+        run: |
+          npm ci
+          npm run build --if-present
+
+      - name: Execute SSH Remote Commands to cPanel and Restart App
+        uses: appleboy/ssh-action@v1.0.3
+        with:
+          host: ${{ secrets.DEPLOY_HOST }}
+          username: ${{ secrets.DEPLOY_USER }}
+          key: ${{ secrets.DEPLOY_KEY }}
+          port: 55222
+          script_stop: true
+          script: |
+            set -e
+            echo "Starting continuous deployment workflow..."
+
+            # Navigate straight to your canonical repository path
+            cd /home/${{ secrets.DEPLOY_USER }}/repositories/The-DukeBox-of-London
+
+            # Fetch the latest structural commits from main securely
+            git fetch origin main
+            git reset --hard origin/main
+
+            # Activate your dedicated Node virtual environment
+            source /home/${{ secrets.DEPLOY_USER }}/nodevenv/repositories/The-DukeBox-of-London/24/bin/activate || source /home/${{ secrets.DEPLOY_USER }}/nodevenv/repositories/The-DukeBox-of-London/20/bin/activate
+
+            # Install clean production dependencies bypassing compiler noise
+            npm ci --omit=dev
+
+            # Force compile any localized typescript definitions
+            npm run build --if-present
+
+            # Build and trigger Passenger process reboots
+            mkdir -p tmp
+            touch tmp/restart.txt
+            echo "Deployment transaction finalized successfully."
