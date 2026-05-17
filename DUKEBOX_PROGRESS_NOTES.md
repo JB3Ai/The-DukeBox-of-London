@@ -26,6 +26,19 @@
 - Rebranded the imported webapp metadata and visible UI strings to The DukeBox of London.
 - Added cPanel Node.js App field guidance to `build.md`, including the recommended app root, startup file, environment mode, passenger log path, and post-pull commands.
 
+### 2026-05-16
+
+- Committed Milestone 2 genre matrix and selector work in `3ae0fad`.
+- Re-architected the public frontend into a locked-viewport, three-screen shell: dashboard, refine, and cockpit.
+- Rewired the browser state functions and selectors to the new hardware-style layout while preserving the 4 phases and 51-genre matrix.
+- Verified the app still builds with `npm run build`, serves `/` successfully, exposes the new `app-container` shell, and returns a healthy `/health` response.
+
+### 2026-05-17
+
+- Chose the bridge path before any direct Python canonical migration: keep the active Node/Lyria deployment working while preparing for the richer FastAPI contract.
+- Replaced `public/app.js` with a bilingual matrix engine that preserves the 51-genre frontend layout, sends the current Node payload first, and retries with the FastAPI integer-phase payload only after a `422` validation response.
+- Normalized the Phase 1 default BPM back inside its allowed range so the initial slider state stays valid.
+
 ## Open Notes
 
 - Confirm whether API compatibility matters before changing endpoint paths. Current endpoints such as `/api/conduct`, `/api/history`, and `/api/vibe-link` do not expose the old brand.

@@ -2,16 +2,15 @@
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <meta
-      name="description"
-      content="The DukeBox of London: conduct AI-generated electronic music in real time."
+      name="viewport"
+      content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"
     />
-    <title>The DukeBox of London | Conduct The Night</title>
+    <title>The DukeBox of London | Conductor Console</title>
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link
-      href="https://fonts.googleapis.com/css2?family=Chakra+Petch:wght@400;500;600;700&family=Rajdhani:wght@500;700&family=IBM+Plex+Mono:wght@400;500&display=swap"
+      href="https://fonts.googleapis.com/css2?family=Chakra+Petch:wght@400;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap"
       rel="stylesheet"
     />
     <link rel="stylesheet" href="/globals.css" />
@@ -19,80 +18,89 @@
   <body data-phase="peak-bass">
     <div class="background-noise" aria-hidden="true"></div>
 
-    <header class="topbar">
-      <p class="brand">The DukeBox of London</p>
-      <button class="chip" id="phase-chip">PEAK-BASS · 150 BPM</button>
-    </header>
-
-    <main>
+    <div id="app-container">
       <section id="screen-dashboard" class="app-screen active">
-        <section class="hero glass-panel">
-          <div class="hero-copy">
-            <p class="eyebrow">AI-native DJ cockpit</p>
-            <h1>Conduct London after dark.</h1>
-            <p>
-              Shape infinite electronic streams with live phase shifts, warehouse
-              energy curves, and precision transitions tuned for real dance
-              floors.
-            </p>
-          </div>
-          <div class="hero-meter glass-card neon-border-cyan" aria-hidden="true">
-            <p>Global Energy</p>
-            <div class="meter-track">
-              <span style="--height: 34%"></span>
-              <span style="--height: 57%"></span>
-              <span style="--height: 91%"></span>
-              <span style="--height: 74%"></span>
-              <span style="--height: 68%"></span>
-              <span style="--height: 85%"></span>
-              <span style="--height: 52%"></span>
-            </div>
-            <small>Choose a phase to begin</small>
-          </div>
-        </section>
+        <header class="topbar">
+          <p class="brand">The DukeBox of London</p>
+          <button class="chip" id="phase-chip" onclick="openRefineScreen()">Configure Vibe</button>
+        </header>
 
-        <section id="phases" class="section-block">
-          <div class="section-title">
-            <p>Energy Architecture</p>
-            <h2>4 live phases, one continuous story</h2>
+        <div class="dashboard-layout">
+          <div class="wheel-pane">
+            <div
+              id="phase-wheel"
+              class="phase-wheel"
+              role="slider"
+              aria-label="Energy phase dial"
+              aria-valuemin="1"
+              aria-valuemax="4"
+              aria-valuenow="1"
+              aria-valuetext="Peak-Bass"
+              tabindex="0"
+            >
+              <div class="phase-wheel-ring"></div>
+              <div class="phase-wheel-needle"></div>
+              <div class="phase-wheel-center"></div>
+            </div>
+            <p class="phase-wheel-readout">Selected Phase: <strong id="phase-readout">Peak-Bass</strong></p>
           </div>
-          <div class="phase-grid">
-            <button type="button" class="phase-card glass-card is-current" data-phase="PEAK-BASS">
-              <h3>PEAK-BASS</h3>
-              <p>Hard techno, jungle pressure, heavy drop geometry.</p>
+
+          <div class="phase-bento-grid">
+            <button
+              type="button"
+              class="phase-card glass-card is-current"
+              data-phase="PEAK-BASS"
+              onclick="selectPhase('PEAK-BASS')"
+            >
+              <h3>PHASE 01: PEAK-BASS</h3>
+              <p>Warehouse techno, neurofunk, hard techno, jungle pressure.</p>
             </button>
-            <button type="button" class="phase-card glass-card" data-phase="MAIN-FLOOR">
-              <h3>MAIN-FLOOR</h3>
-              <p>Groove-weighted UK garage, deep house, liquid pulse.</p>
+            <button
+              type="button"
+              class="phase-card glass-card"
+              data-phase="MAIN-FLOOR"
+              onclick="selectPhase('MAIN-FLOOR')"
+            >
+              <h3>PHASE 02: MAIN-FLOOR</h3>
+              <p>UK garage, tech house, deep house, liquid pulse.</p>
             </button>
-            <button type="button" class="phase-card glass-card" data-phase="SUNRISE">
-              <h3>SUNRISE</h3>
-              <p>Breakbeat air, dub techno glow, soft movement arcs.</p>
+            <button
+              type="button"
+              class="phase-card glass-card"
+              data-phase="SUNRISE"
+              onclick="selectPhase('SUNRISE')"
+            >
+              <h3>PHASE 03: SUNRISE</h3>
+              <p>Organic breakbeats, future garage, dub techno glow.</p>
             </button>
-            <button type="button" class="phase-card glass-card" data-phase="ZONED-OUT">
-              <h3>ZONED-OUT</h3>
-              <p>Ambient dub and downtempo breath for after-hours drift.</p>
+            <button
+              type="button"
+              class="phase-card glass-card"
+              data-phase="ZONED-OUT"
+              onclick="selectPhase('ZONED-OUT')"
+            >
+              <h3>PHASE 04: ZONED-OUT</h3>
+              <p>Ambient dub, downtempo breath, trip-hop after-hours drift.</p>
             </button>
           </div>
-        </section>
+        </div>
       </section>
 
       <section id="screen-refine" class="app-screen hidden">
-        <header class="app-header">
-          <button class="back-btn" onclick="showScreen('screen-dashboard')">← BACK</button>
-          <p class="brand" id="selected-phase-title">PHASE SELECTION</p>
-          <div class="status-indicator" id="phase-meta-readout">000 BPM</div>
+        <header class="topbar">
+          <button class="btn-back" onclick="showScreen('screen-dashboard')">&larr; BACK TO DIAL</button>
+          <p class="brand" id="refine-screen-title">REFINE AI ARCHITECTURE</p>
         </header>
 
-        <div class="refine-container glass-panel">
+        <div class="refine-workspace">
           <div class="form-group">
-            <label>SELECT SUB-GENRE ARCHITECTURE</label>
-            <div id="genre-bento-grid" class="genre-bento-grid"></div>
+            <label>SELECT SPECIFIC SUB-GENRE METACODE</label>
+            <div id="genre-bento-explorer" class="genre-bento-explorer"></div>
           </div>
 
           <div class="form-group">
-            <label>ATMOSPHERE INTENSITY</label>
-            <div class="segmented-control" id="atmosphere-control">
+            <label>HARMONIC DENSITY ATMOSPHERE</label>
+            <div class="segmented-control" id="ctrl-atmosphere">
               <button class="seg-btn active" onclick="setAtmosphere('dark')">Dark &amp; Moody</button>
               <button class="seg-btn" onclick="setAtmosphere('balanced')">Balanced</button>
               <button class="seg-btn" onclick="setAtmosphere('uplifting')">Uplifting</button>
@@ -100,55 +108,66 @@
           </div>
 
           <div class="form-group">
-            <label>VOCAL STYLE TRANSCRIPTION</label>
-            <div class="segmented-control" id="vocal-control">
-              <button class="seg-btn active" onclick="setVocal('off')">Off</button>
-              <button class="seg-btn" onclick="setVocal('male')">Male</button>
-              <button class="seg-btn" onclick="setVocal('female')">Female</button>
-              <button class="seg-btn" onclick="setVocal('ethereal')">Ethereal</button>
+            <label>VOCAL TRANSCRIPTION VECTOR</label>
+            <div class="segmented-control" id="ctrl-vocals">
+              <button class="seg-btn active" onclick="setVocalStyle('off')">Off (Ambient)</button>
+              <button class="seg-btn" onclick="setVocalStyle('male')">Male</button>
+              <button class="seg-btn" onclick="setVocalStyle('female')">Female</button>
+              <button class="seg-btn" onclick="setVocalStyle('ethereal')">Ethereal</button>
             </div>
           </div>
 
           <div class="form-group">
-            <label>VELOCITY CURVE (BPM)</label>
-            <input type="range" class="velocity-slider" id="bpm-slider" oninput="updateBpmReadout(this.value)" />
-            <div class="slider-labels">
-              <span id="slider-min-label">Slow</span>
-              <span id="bpm-readout" class="highlight">128 BPM</span>
-              <span id="slider-max-label">Fast</span>
+            <label>VELOCITY CURVE (TEMPO LOCK)</label>
+            <input type="range" class="velocity-slider" id="bpm-slider" oninput="adjustVelocity(this.value)" />
+            <div class="slider-readout">
+              <span id="lbl-min-bpm">60 BPM</span>
+              <span id="bpm-live-counter" class="highlight-cyan">128 BPM</span>
+              <span id="lbl-max-bpm">180 BPM</span>
             </div>
           </div>
 
-          <button class="btn btn-primary master-btn" onclick="startConducting()">CONDUCTING VIBE...</button>
+          <button
+            type="button"
+            class="btn btn-primary submit-btn master-conduct-btn"
+            onclick="triggerNeuralHandshake()"
+          >
+            Conduct Machine Vibe
+          </button>
         </div>
       </section>
 
       <section id="screen-cockpit" class="app-screen hidden">
-        <header class="app-header">
-          <button class="back-btn" onclick="showScreen('screen-refine')">← BACK</button>
-          <p class="brand">LIVE COCKPIT</p>
-          <div class="status-indicator">NEURAL SYNC</div>
+        <header class="topbar">
+          <button class="btn-back" onclick="abortSession()">&larr; DISCONNECT</button>
+          <div class="status-pill live-glow">● NEURAL STREAM ACTIVE</div>
         </header>
 
-        <section class="conductor glass-panel cockpit-panel">
-          <div class="section-title">
-            <p>Now Conducting</p>
-            <h2 id="active-track">Latent Seed Generator</h2>
-          </div>
-
-          <div class="playback glass-card neon-border-magenta">
-            <p class="playback-title">Now Playing</p>
-            <div id="visualizer-container" class="visualizer-container" aria-hidden="true">
+        <div class="cockpit-workspace">
+          <div class="playback-monitor glass-card">
+            <p class="playback-title">Lyria 3 Studio Engine Readout</p>
+            <div id="visualizer-container" class="visualizer-container">
               <canvas id="neural-mesh"></canvas>
             </div>
+            <div id="waveform-visualizer" class="waveform"></div>
             <audio id="generated-audio" controls preload="none"></audio>
+
+            <div class="meta-display-block">
+              <p class="technical-meta-tag">TRACK ID: <span id="meta-track-id">--------</span></p>
+              <p class="technical-meta-tag">GENRE ARCH: <span id="meta-genre-arch">----------------</span></p>
+            </div>
+
             <div id="lyrics-stream" class="lyrics-stream">
-              Neural mesh is waiting for the first signal.
+              Neural mesh standing by for transient synthesis...
             </div>
           </div>
-        </section>
+
+          <footer class="cockpit-footer" onclick="incrementEggCounter()">
+            <p class="footer-serial">SYSTEM: ACTIVE // DEEPMIND LYRIA PRO WORKSTATION v1.0</p>
+          </footer>
+        </div>
       </section>
-    </main>
+    </div>
 
     <script src="/app.js" defer></script>
   </body>
