@@ -44,11 +44,14 @@ jobs:
             git fetch origin main
             git reset --hard origin/main
 
-            # Install clean production dependencies bypassing compiler noise
-            npm ci --omit=dev
+            # Install full dependencies so the TypeScript compiler is available
+            npm ci
 
-            # Force compile any localized typescript definitions
+            # Compile localized TypeScript definitions before pruning dev tools
             npm run build --if-present
+
+            # Keep only production dependencies after the build completes
+            npm prune --omit=dev
 
             # Build and trigger Passenger process reboots
             mkdir -p tmp
