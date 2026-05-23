@@ -1,0 +1,42 @@
+/* App-level styles are in index.css — this file is for component overrides */
+
+/* Custom range slider */
+input[type="range"] {
+  -webkit-appearance: none;
+  height: 4px;
+  border-radius: 2px;
+  outline: none;
+}
+
+input[type="range"]::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  background: white;
+  cursor: pointer;
+  border: 2px solid var(--phase-color, #00E6F2);
+  box-shadow: 0 0 8px var(--phase-color, rgba(0, 230, 242, 0.4));
+  transition: box-shadow 0.2s ease;
+}
+
+input[type="range"]::-webkit-slider-thumb:hover {
+  box-shadow: 0 0 16px var(--phase-color, rgba(0, 230, 242, 0.6));
+}
+
+input[type="range"]::-moz-range-thumb {
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  background: white;
+  cursor: pointer;
+  border: 2px solid var(--phase-color, #00E6F2);
+  box-shadow: 0 0 8px rgba(0, 230, 242, 0.4);
+}
+
+/* Recharts tooltip fix */
+.recharts-default-tooltip {
+  background: #121215 !important;
+  border: 1px solid #1E1E24 !important;
+  border-radius: 8px !important;
+}

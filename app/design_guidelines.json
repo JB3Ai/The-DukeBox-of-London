@@ -1,10 +1,10 @@
 {
-  "project_name": "The DukeBox of London - London Legend Edition",
+  "project_name": "JukeBox - London Legend Edition",
   "theme_and_archetype": {
     "theme": "dark",
     "primary_archetype": "Archetype 7: Electric & Neon (Cyberpunk/Futuristic)",
     "secondary_archetype": "Archetype 4: Swiss & High-Contrast (Hardware/Brutalist)",
-    "reasoning": "The DukeBox of London is a premium AI-native electronic music app for professional DJs embedded in UK rave culture. It requires high-energy, dark-mode cyberpunk aesthetics (Archetype 7) combined with the precision and tactile functionality of analog audio hardware (Archetype 4)."
+    "reasoning": "JukeBox is a premium AI-native electronic music app for professional DJs embedded in UK rave culture. It requires high-energy, dark-mode cyberpunk aesthetics (Archetype 7) combined with the precision and tactile functionality of analog audio hardware (Archetype 4)."
   },
   "colors": {
     "background": {

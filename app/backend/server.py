@@ -218,7 +218,7 @@ app.add_middleware(
 
 @app.get("/api/health")
 async def health():
-    return {"status": "ok", "service": "dukebox-api"}
+    return {"status": "ok", "service": "jukebox-api"}
 
 
 @app.get("/api/phases")

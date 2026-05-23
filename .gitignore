@@ -16,14 +16,19 @@ __pycache__/
 # Node dependencies and build caches
 node_modules/
 client/.next/
+client/build/
 client/out/
+client/yarn.lock
 app/frontend/node_modules/
 app/frontend/.cache/
+app/yarn*.lock
 
 # OS/editor noise
 .DS_Store
 Thumbs.db
+*.lnk
 
 # Logs
 *.log
 npm-debug.log*
+tmp/

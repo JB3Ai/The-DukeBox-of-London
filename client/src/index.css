@@ -1,0 +1,120 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --skin-bg: #0A0A0F;
+  --skin-surface: #121215;
+  --skin-surface-glass: rgba(10,10,15,0.6);
+  --skin-accent: #EA00F2;
+  --skin-accent2: #00E6F2;
+  --skin-text: #FFFFFF;
+  --skin-text-secondary: #8A8A93;
+  --skin-text-muted: #55555C;
+  --skin-border: #1E1E24;
+  --skin-border-hover: rgba(0,230,242,0.3);
+  --skin-knob-top: #1a1a24;
+  --skin-knob-bottom: #0A0A0F;
+  --skin-knob-border: #2a2a35;
+  --skin-panel-bg: #0A0A0F;
+  --skin-card-shadow: rgba(0,0,0,0.4);
+  --skin-glow: rgba(234,0,242,0.3);
+  --skin-viz-bg: rgba(10,10,15,0.2);
+  --skin-scroll-track: #0A0A0F;
+  --skin-scroll-thumb: #1E1E24;
+  --phase-color: #EA00F2;
+}
+
+* { margin: 0; padding: 0; box-sizing: border-box; }
+
+body {
+  background: var(--skin-bg);
+  color: var(--skin-text);
+  font-family: 'Manrope', sans-serif;
+  -webkit-font-smoothing: antialiased;
+  overflow-x: hidden;
+  transition: background 0.5s ease, color 0.5s ease;
+}
+
+::-webkit-scrollbar { width: 4px; }
+::-webkit-scrollbar-track { background: var(--skin-scroll-track); }
+::-webkit-scrollbar-thumb { background: var(--skin-scroll-thumb); border-radius: 2px; }
+::-webkit-scrollbar-thumb:hover { background: var(--skin-accent); }
+
+/* --- Grain / Noise Texture Overlays --- */
+.texture-grain {
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.06'/%3E%3C/svg%3E");
+  background-repeat: repeat;
+  background-size: 256px 256px;
+  opacity: 0.4;
+  mix-blend-mode: overlay;
+}
+
+.texture-grain-subtle {
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.7' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.04'/%3E%3C/svg%3E");
+  background-repeat: repeat;
+  background-size: 200px 200px;
+  opacity: 0.3;
+  mix-blend-mode: overlay;
+}
+
+/* --- Keyframes --- */
+@keyframes shimmer { 0%, 100% { opacity: 0.3; } 50% { opacity: 1; } }
+@keyframes scanline { 0% { transform: translateY(-100%); } 100% { transform: translateY(100%); } }
+@keyframes pulse-glow { 0%, 100% { box-shadow: 0 0 20px var(--skin-glow); } 50% { box-shadow: 0 0 40px var(--skin-glow); } }
+@keyframes breathe { 0%, 100% { opacity: 0.6; transform: scale(1); } 50% { opacity: 1; transform: scale(1.02); } }
+
+/* --- Shimmer Edge --- */
+.shimmer-edge {
+  position: fixed; top: 0; left: 0; right: 0; height: 2px;
+  background: linear-gradient(90deg, transparent, var(--phase-color), transparent);
+  animation: shimmer 2s ease-in-out infinite;
+  z-index: 100; pointer-events: none;
+}
+
+/* --- Glass Card --- */
+.glass-card {
+  background: var(--skin-surface-glass);
+  backdrop-filter: blur(24px);
+  -webkit-backdrop-filter: blur(24px);
+  border: 1px solid var(--skin-border);
+  transition: border-color 0.3s ease, box-shadow 0.3s ease, background 0.5s ease;
+}
+.glass-card:hover {
+  border-color: var(--skin-border-hover);
+  box-shadow: 0 8px 32px var(--skin-card-shadow);
+}
+
+/* --- Hardware Knob --- */
+.knob {
+  border-radius: 50%;
+  background: linear-gradient(180deg, var(--skin-knob-top) 0%, var(--skin-knob-bottom) 100%);
+  border: 1px solid var(--skin-knob-border);
+  box-shadow: 0 4px 10px rgba(0,0,0,0.8), inset 0 1px 2px rgba(255,255,255,0.1);
+  cursor: grab;
+  transition: box-shadow 0.2s ease, background 0.5s ease, border-color 0.5s ease;
+}
+.knob:active { cursor: grabbing; box-shadow: 0 2px 5px rgba(0,0,0,0.6), inset 0 1px 2px rgba(255,255,255,0.05); }
+
+/* --- Hardware Panel --- */
+.hardware-panel {
+  background: var(--skin-panel-bg);
+  border: 1px solid var(--skin-border);
+  box-shadow: inset 0 1px 0 rgba(255,255,255,0.03);
+  transition: background 0.5s ease, border-color 0.5s ease;
+  position: relative;
+}
+
+/* Auto-apply subtle grain to hardware panels */
+.hardware-panel::before {
+  content: '';
+  position: absolute; inset: 0;
+  border-radius: inherit;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.03'/%3E%3C/svg%3E");
+  background-repeat: repeat;
+  background-size: 200px 200px;
+  opacity: 0.5;
+  mix-blend-mode: overlay;
+  pointer-events: none;
+  z-index: 0;
+}
