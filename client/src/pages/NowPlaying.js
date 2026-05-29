@@ -226,9 +226,42 @@ export default function NowPlaying({ activePhase, currentTrack, setCurrentTrack,
 
   // Play/pause engine
   useEffect(() => {
-    if (isPlaying) { engineRef.current?.play().then(() => setAudioReady(true)); }
-    else { engineRef.current?.stop(); }
-  }, [isPlaying]);
+    const engine = engineRef.current;
+    let cancelled = false;
+    const lyriaData = currentTrack?.audioData?.data;
+
+    if (!engine) return undefined;
+
+    if (!isPlaying) {
+      if (lyriaData) {
+        engine.stopLyriaTrack();
+      } else {
+        engine.stop();
+      }
+      setAudioReady(false);
+      return undefined;
+    }
+
+    const playTrack = async () => {
+      if (lyriaData) {
+        const loaded = await engine.loadLyriaTrack(lyriaData);
+        if (cancelled) return;
+
+        if (loaded) {
+          engine.playLyriaTrack();
+          setAudioReady(true);
+          return;
+        }
+      }
+
+      await engine.play();
+      if (!cancelled) setAudioReady(true);
+    };
+
+    playTrack();
+
+    return () => { cancelled = true; };
+  }, [isPlaying, currentTrack?.track_id, currentTrack?.audioData?.data]);
 
   // Auto-conduct on mount
   useEffect(() => {

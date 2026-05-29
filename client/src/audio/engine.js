@@ -382,6 +382,7 @@ class JukeBoxEngine {
 
   stop() {
     this.isPlaying = false;
+    this.stopLyriaTrack();
     if (this.timerID) {
       clearInterval(this.timerID);
       this.timerID = null;
@@ -400,6 +401,51 @@ class JukeBoxEngine {
       this.masterGain.gain.setTargetAtTime(0.7 * dip, this.ctx.currentTime, 0.1);
     }
     this._updatePad();
+  }
+
+  // --- AI Track Decoding & Playback ---
+  async loadLyriaTrack(base64Data) {
+    if (!this.ctx) await this.init();
+    try {
+      // 1. Convert Base64 payload to raw binary
+      const binaryString = window.atob(base64Data);
+      const len = binaryString.length;
+      const bytes = new Uint8Array(len);
+      for (let i = 0; i < len; i++) {
+        bytes[i] = binaryString.charCodeAt(i);
+      }
+
+      // 2. Decode the raw WAV into a Web Audio buffer
+      this.lyriaBuffer = await this.ctx.decodeAudioData(bytes.buffer);
+      console.log("Lyria AI track decoded successfully!");
+      return true;
+    } catch (err) {
+      console.error("Failed to decode AI audio:", err);
+      return false;
+    }
+  }
+
+  playLyriaTrack() {
+    if (!this.ctx || !this.lyriaBuffer) return;
+
+    this.stop(); // Stop anything currently playing
+
+    this.lyriaSource = this.ctx.createBufferSource();
+    this.lyriaSource.buffer = this.lyriaBuffer;
+
+    // 3. Connect to the compressor/analyser so the UI visualizer reacts!
+    this.lyriaSource.connect(this.compressor);
+
+    this.lyriaSource.start(0);
+    this.isPlaying = true;
+  }
+
+  stopLyriaTrack() {
+    if (this.lyriaSource) {
+      try { this.lyriaSource.stop(); } catch (e) {}
+      this.lyriaSource.disconnect();
+      this.lyriaSource = null;
+    }
   }
 
   destroy() {

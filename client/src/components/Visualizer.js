@@ -1,6 +1,6 @@
 import React, { useRef, useEffect, useCallback } from 'react';
 import { getEngine } from '../audio/engine';
-import { PHASE_COLORS, SKINS } from '../data/constants';
+import { SKINS } from '../data/constants';
 
 // Accept skinKey to determine visualizer colors
 export default function Visualizer({ phase, isPlaying, bpm = 128, skinKey = 'original' }) {
