@@ -5,6 +5,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 const express_1 = __importDefault(require("express"));
 const node_path_1 = __importDefault(require("node:path"));
 const dotenv_1 = __importDefault(require("dotenv"));
+const fs_1 = __importDefault(require("fs"));
 const genai_1 = require("@google/genai");
 dotenv_1.default.config();
 const port = Number(process.env.PORT) || 3000;
@@ -12,7 +13,14 @@ const apiKey = process.env.GEMINI_API_KEY;
 const ai = apiKey ? new genai_1.GoogleGenAI({ apiKey }) : null;
 const app = (0, express_1.default)();
 app.use(express_1.default.json({ limit: '1mb' }));
-app.use(express_1.default.static(node_path_1.default.join(__dirname, 'public')));
+const clientBuildDir = node_path_1.default.join(__dirname, '..', 'client', 'build');
+const publicDir = node_path_1.default.join(__dirname, 'public');
+const hasClientBuild = fs_1.default.existsSync(clientBuildDir);
+if (hasClientBuild) {
+  app.use(express_1.default.static(clientBuildDir));
+} else {
+  app.use(express_1.default.static(publicDir));
+}
 app.get('/health', (_req, res) => {
     res.json({ status: 'ok', project: 'The DukeBox of London' });
 });

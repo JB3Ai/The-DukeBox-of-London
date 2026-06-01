@@ -27,41 +27,47 @@ export default function Knob({ label, value = 50, onChange, size = 80, color = '
   }, []);
 
   return (
-    <div className="flex flex-col items-center gap-2" data-testid={testId}>
+    <div className="flex flex-col items-center gap-3" data-testid={testId}>
       <div
         ref={knobRef}
-        className="knob relative flex items-center justify-center cursor-grab active:cursor-grabbing"
+        className="relative flex items-center justify-center cursor-grab active:cursor-grabbing rounded-full"
         style={{
           width: size,
           height: size,
+          background: `repeating-conic-gradient(#0A0A0F 0% 4%, #1E1E24 4% 8%)`,
+          border: `2px solid #000`,
           boxShadow: dragging
-            ? `0 0 20px ${color}40, 0 4px 10px rgba(0,0,0,0.8), inset 0 1px 2px rgba(255,255,255,0.1)`
-            : '0 4px 10px rgba(0,0,0,0.8), inset 0 1px 2px rgba(255,255,255,0.1)'
+            ? `0 0 15px ${color}40, 0 2px 5px rgba(0,0,0,0.8)`
+            : `0 8px 15px rgba(0,0,0,0.9)`,
+          transform: dragging ? 'scale(0.98)' : 'scale(1)',
+          transition: 'transform 0.1s ease, box-shadow 0.1s ease'
         }}
         onPointerDown={handlePointerDown}
         onPointerMove={handlePointerMove}
         onPointerUp={handlePointerUp}
       >
-        {/* Indicator line */}
-        <div
-          className="absolute w-0.5 rounded-full"
-          style={{
-            height: size * 0.3,
-            top: '10%',
-            background: color,
-            transform: `rotate(${rotation}deg)`,
-            transformOrigin: `center ${size * 0.4}px`,
-            boxShadow: `0 0 6px ${color}`,
-          }}
-        />
-        {/* Center dot */}
-        <div
-          className="w-2 h-2 rounded-full"
-          style={{ background: color, boxShadow: `0 0 8px ${color}` }}
-        />
+        <div className="absolute w-[65%] h-[65%] rounded-full flex items-center justify-center" style={{
+          background: 'linear-gradient(145deg, #2a2a35, #121215)',
+          border: '1px solid #000',
+          boxShadow: 'inset 0 1px 1px rgba(255,255,255,0.1)'
+        }}>
+          <div
+            className="absolute w-1 rounded-full"
+            style={{
+              height: size * 0.25,
+              top: '5%',
+              background: color,
+              transform: `rotate(${rotation}deg)`,
+              transformOrigin: `center ${size * 0.27}px`,
+              boxShadow: `0 0 8px ${color}`,
+            }}
+          />
+        </div>
       </div>
-      <span className="font-data text-xs text-gray-500 uppercase tracking-widest">{label}</span>
-      <span className="font-data text-xs" style={{ color }}>{value}%</span>
+      <div className="text-center">
+        <span className="font-data text-[9px] text-gray-500 uppercase tracking-widest block">{label}</span>
+        <span className="font-display text-sm tracking-wider" style={{ color, textShadow: `0 0 10px ${color}80` }}>{value}</span>
+      </div>
     </div>
   );
 }
