@@ -3,7 +3,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { PHASE_COLORS } from '../data/constants';
 import { useTheme } from '../hooks/useTheme';
 
-const API = process.env.REACT_APP_BACKEND_URL;
+const API = process.env.REACT_APP_BACKEND_URL || '';
 
 export default function ShareModal({ track, onClose }) {
   const t = useTheme();

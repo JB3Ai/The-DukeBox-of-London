@@ -1,5 +1,6 @@
 import express from 'express';
 import path from 'node:path';
+import fs from 'fs';
 import dotenv from 'dotenv';
 import { GoogleGenAI } from '@google/genai';
 
@@ -11,117 +12,183 @@ const apiKey = process.env.GEMINI_API_KEY;
 const ai = apiKey ? new GoogleGenAI({ apiKey }) : null;
 const app = express();
 
-const PHASES = [
+type PhaseData = {
+  code: number;
+  name: string;
+  vibe: string;
+  description: string;
+  bpm_range: [number, number];
+};
+
+type GenreData = {
+  code: string;
+  name: string;
+  phase: number;
+  bpm: [number, number];
+  desc: string;
+};
+
+const PHASES_DATA: PhaseData[] = [
   {
     code: 1,
     name: 'PEAK-BASS',
-    vibe: 'Peak Hour & Heavy Bass',
-    color: '#EA00F2',
-    bg: '#0A0A0F',
-    bpm_range: [140, 180],
-    description: 'Warehouse techno at peak intensity. Neurofunk, hard techno, dubstep, jungle.',
+    vibe: 'Warehouse Techno & Rave Heavyweights',
+    description: 'Maximum velocity. Tailored for late-night concrete spaces with heavy bass reinforcement.',
+    bpm_range: [140, 165],
   },
   {
     code: 2,
     name: 'MAIN-FLOOR',
-    vibe: 'Groove & Flow',
-    color: '#00E6F2',
-    bg: '#0A0A0F',
-    bpm_range: [120, 140],
-    description: 'Deep house, tech house, UK garage, melodic techno. The steady groove.',
+    vibe: 'Groove, Flow & Sub-Genre Lineage',
+    description: 'The absolute sweet spot. High syncopation, crisp 2-step patterns, and driving warehouse energy.',
+    bpm_range: [124, 135],
   },
   {
     code: 3,
     name: 'SUNRISE',
-    vibe: 'The Transition',
-    color: '#A7C7E7',
-    bg: '#0F0F1A',
-    bpm_range: [100, 128],
-    description: 'Organic house, balearic beat, breakbeat, future garage. Dawn is breaking.',
+    vibe: 'Melodic Electronic Transitions',
+    description: 'Lush, warm chords and broken beats catching the morning light as the room breathes.',
+    bpm_range: [110, 123],
   },
   {
     code: 4,
     name: 'ZONED-OUT',
-    vibe: 'Chilled After-Party',
-    color: '#E9967A',
-    bg: '#1A1610',
-    bpm_range: [60, 100],
-    description: 'Trip-hop, downtempo, ambient dub, lo-fi. The contemplative after-hours.',
+    vibe: 'Ambient Soundscapes & Afterhours Chill',
+    description: 'Deep spatial exploration. Heavy tape echo, vinyl crackle, and beautiful downtempo sound fields.',
+    bpm_range: [70, 105],
   },
 ];
 
-const GENRES = [
-  { code: 'B-01', name: 'Peak Hour Techno', phase: 1, bpm: [145, 160] },
-  { code: 'B-02', name: 'Neurofunk', phase: 1, bpm: [170, 180] },
-  { code: 'B-03', name: 'Hard Techno', phase: 1, bpm: [150, 165] },
-  { code: 'B-04', name: 'Bass House', phase: 1, bpm: [125, 135] },
-  { code: 'B-05', name: 'Dubstep (Riddim)', phase: 1, bpm: [140, 150] },
-  { code: 'B-06', name: 'Dubstep (OG)', phase: 1, bpm: [138, 142] },
-  { code: 'B-07', name: 'Brostep', phase: 1, bpm: [140, 150] },
-  { code: 'B-08', name: 'Jungle', phase: 1, bpm: [160, 180] },
-  { code: 'B-09', name: 'Drumstep', phase: 1, bpm: [165, 175] },
-  { code: 'B-10', name: 'Acid Techno', phase: 1, bpm: [140, 155] },
-  { code: 'B-11', name: 'Psytrance', phase: 1, bpm: [138, 150] },
-  { code: 'B-12', name: 'Ghetto House / Juke', phase: 1, bpm: [155, 165] },
-  { code: 'B-13', name: 'Hardstyle', phase: 1, bpm: [150, 160] },
-  { code: 'H-13', name: 'Deep House', phase: 2, bpm: [120, 125] },
-  { code: 'H-14', name: 'Tech House', phase: 2, bpm: [124, 130] },
-  { code: 'M-15', name: 'Minimal Techno', phase: 2, bpm: [128, 135] },
-  { code: 'M-16', name: 'Melodic Techno', phase: 2, bpm: [122, 132] },
-  { code: 'G-17', name: 'UK Garage (2-Step)', phase: 2, bpm: [130, 140] },
-  { code: 'G-18', name: 'Bassline', phase: 2, bpm: [130, 140] },
-  { code: 'H-19', name: 'Progressive House', phase: 2, bpm: [126, 132] },
-  { code: 'H-20', name: 'Afro House', phase: 2, bpm: [120, 128] },
-  { code: 'H-21', name: 'Amapiano', phase: 2, bpm: [110, 120] },
-  { code: "H-22", name: "Jackin' House", phase: 2, bpm: [124, 130] },
-  { code: 'D-23', name: 'Nu-Disco', phase: 2, bpm: [118, 126] },
-  { code: 'D-24', name: 'Italo Disco', phase: 2, bpm: [118, 125] },
-  { code: 'D-25', name: 'Liquid D&B', phase: 2, bpm: [170, 178] },
-  { code: 'O-26', name: 'Organic House', phase: 3, bpm: [118, 124] },
-  { code: 'O-27', name: 'Microhouse', phase: 3, bpm: [120, 130] },
-  { code: 'O-28', name: 'Balearic Beat', phase: 3, bpm: [100, 118] },
-  { code: 'O-29', name: 'Breakbeat', phase: 3, bpm: [120, 140] },
-  { code: 'O-30', name: 'French House', phase: 3, bpm: [120, 128] },
-  { code: 'O-31', name: 'Electro (Detroit)', phase: 3, bpm: [125, 135] },
-  { code: 'O-32', name: 'Future Garage', phase: 3, bpm: [130, 140] },
-  { code: 'O-33', name: 'Leftfield House', phase: 3, bpm: [118, 128] },
-  { code: 'O-34', name: 'Dub Techno', phase: 3, bpm: [120, 130] },
-  { code: 'L-35', name: 'Lo-Fi House', phase: 3, bpm: [115, 125] },
-  { code: 'A-36', name: 'Trip-Hop', phase: 4, bpm: [70, 100] },
-  { code: 'A-37', name: 'Downtempo', phase: 4, bpm: [80, 110] },
-  { code: 'A-38', name: 'Lo-Fi Hip Hop', phase: 4, bpm: [70, 90] },
-  { code: 'A-39', name: 'Ambient Dub', phase: 4, bpm: [60, 90] },
-  { code: 'A-40', name: 'Chillwave', phase: 4, bpm: [80, 110] },
-  { code: 'A-41', name: 'Vaporwave', phase: 4, bpm: [60, 100] },
-  { code: 'A-42', name: 'Psybient', phase: 4, bpm: [80, 120] },
-  { code: 'A-43', name: 'IDM', phase: 4, bpm: [100, 140] },
-  { code: 'A-44', name: 'Folktronica', phase: 4, bpm: [80, 120] },
-  { code: 'A-45', name: 'Glitch-Hop', phase: 4, bpm: [90, 110] },
-  { code: 'A-46', name: 'Ethereal Wave', phase: 4, bpm: [80, 120] },
-  { code: 'A-47', name: 'Dark Ambient', phase: 4, bpm: [60, 80] },
-  { code: 'A-48', name: 'Illbient', phase: 4, bpm: [60, 90] },
-  { code: 'A-49', name: 'Space Music', phase: 4, bpm: [60, 80] },
-  { code: 'A-50', name: 'Post-Classical', phase: 4, bpm: [60, 90] },
+const GENRES_MATRIX: GenreData[] = [
+  { code: 'w-techno', name: 'Warehouse Techno', phase: 1, bpm: [145, 160], desc: 'Heavy industrial four-on-the-floor pulse straight from East London squats.' },
+  { code: 'neurofunk', name: 'Neurofunk', phase: 1, bpm: [170, 180], desc: 'Aggressive, tech-driven drum and bass featuring complex sound-designed basslines.' },
+  { code: 'acid-core', name: 'Acid Core', phase: 1, bpm: [145, 165], desc: 'Searing 303 squelches riding a high-velocity kicks platform.' },
+  { code: 'hardcore-break', name: 'Hardcore Breakbeat', phase: 1, bpm: [150, 170], desc: 'Vintage 1992 rave energy with sped-up breakbeats and euphoric stabs.' },
+  { code: 'techstep', name: 'Techstep', phase: 1, bpm: [168, 176], desc: 'Dark, cold, and algorithmic drum and bass with an industrial footprint.' },
+  { code: 'industrial-bass', name: 'Industrial Bass', phase: 1, bpm: [140, 155], desc: 'Low-end distortions mixed with heavy cinematic metal impacts.' },
+  { code: 'schranz', name: 'Hard Schranz', phase: 1, bpm: [150, 165], desc: 'Mechanized, loop-driven techno firing at relentless tempos.' },
+  { code: 'cyber-punk-club', name: 'Cyber Club', phase: 1, bpm: [135, 150], desc: 'Gritty synthesizer-driven club music for subterranean bunkers.' },
+  { code: 'darkcore', name: 'Darkcore', phase: 1, bpm: [160, 175], desc: 'Heavy breakbeats layered with dark horror movie samples and deep sub-bass.' },
+  { code: 'breakcore', name: 'Breakcore', phase: 1, bpm: [170, 190], desc: 'Chaotic, chopped-up amen breaks operating at frantic tempos.' },
+  { code: 'hardstyle-uk', name: 'UK Hardstyle', phase: 1, bpm: [150, 160], desc: 'Reverberating reverse-bass kicks with clean rave leads.' },
+  { code: 'footwork-uk', name: 'London Footwork', phase: 1, bpm: [155, 165], desc: 'Hypnotic 160bpm syncopations blended with UK sound system elements.' },
+  { code: 'jumpup', name: 'Jump-Up DNB', phase: 1, bpm: [172, 178], desc: 'Energetic, clean bass hooks paired with direct rolling drums.' },
+
+  { code: 'uk-garage', name: 'UK Garage (2-Step)', phase: 2, bpm: [130, 140], desc: 'Classic syncopated 90s swinging rhythms with lush soulful vocal chops.' },
+  { code: 'tech-house', name: 'Tech House', phase: 2, bpm: [124, 130], desc: 'Steady house groove meets the hypnotic structural elements of techno.' },
+  { code: 'deep-house-london', name: 'London Deep House', phase: 2, bpm: [120, 125], desc: 'Atmospheric, jazz-infused chords driving a clean, late-night pulse.' },
+  { code: 'minimal-audio', name: 'Minimal Audio', phase: 2, bpm: [124, 132], desc: 'Stripped-back microhouse tracks focused on micro-percussions and modular ticks.' },
+  { code: 'grime-inst', name: 'Grime Instrumental', phase: 2, bpm: [138, 142], desc: 'Raw, jagged 140bpm square waves originating from Bow, East London.' },
+  { code: 'dubstep-classic', name: 'Classic Dubstep', phase: 2, bpm: [138, 142], desc: 'Pure 140bpm spatial meditation with deep sub-bass weight, Croydon lineage.' },
+  { code: 'funky-uk', name: 'UK Funky', phase: 2, bpm: [124, 132], desc: 'Tribal Afro-house percussive rhythms layered with British club melodies.' },
+  { code: 'bassline', name: 'Bassline / Niche', phase: 2, bpm: [130, 140], desc: 'Fast, warping bassline tracking alongside crisp 4x4 garage drums.' },
+  { code: 'progressive-uk', name: 'UK Progressive', phase: 2, bpm: [126, 132], desc: 'Evolving melodic soundscapes moving across steady progressive structures.' },
+  { code: 'electro-clash', name: 'Electro Clash', phase: 2, bpm: [122, 130], desc: 'Gritty, punk-influenced sawtooth bass loops and analog drum machines.' },
+  { code: 'tribal-groove', name: 'Tribal Groove', phase: 2, bpm: [124, 132], desc: 'Hypnotic drum ensembles layered over tight modern club basslines.' },
+  { code: 'bumpy-house', name: 'Bumpy House', phase: 2, bpm: [124, 130], desc: 'Heavy organ basslines backed by swinging US-style garage loops.' },
+  { code: 'speed-garage', name: 'Speed Garage', phase: 2, bpm: [130, 138], desc: 'Accelerated house grooves complete with warped ragga bass dropboards.' },
+
+  { code: 'liquid-dnb', name: 'Liquid Drum & Bass', phase: 3, bpm: [170, 178], desc: 'Melodic, ambient soundscapes backed by smooth rolling drum patterns.' },
+  { code: 'breakbeat-prog', name: 'Progressive Breaks', phase: 3, bpm: [120, 132], desc: 'Lush atmospheric pads resting over broken syncopated grooves.' },
+  { code: 'organic-house', name: 'Organic House', phase: 3, bpm: [118, 124], desc: 'Warm acoustic instrumentation weaving through natural house elements.' },
+  { code: 'balearic-beat', name: 'Balearic Beat', phase: 3, bpm: [100, 118], desc: 'Sun-soaked open-air club music blending chillout textures with gentle grooves.' },
+  { code: 'ambient-house', name: 'Ambient House', phase: 3, bpm: [110, 122], desc: 'Dreamy synth washes tracking alongside relaxed house foundations.' },
+  { code: 'dream-synth', name: 'Dream Synth', phase: 3, bpm: [95, 115], desc: 'Bright nostalgic chords moving through cinematic sound environments.' },
+  { code: 'afro-house-uk', name: 'UK Afro-House', phase: 3, bpm: [118, 126], desc: 'Warm hypnotic polyrhythms combined with modern British engineering.' },
+  { code: 'chillstep', name: 'Chillstep', phase: 3, bpm: [130, 140], desc: 'Slow, half-time rhythms carrying vast delay structures and gentle basslines.' },
+  { code: 'cosmic-disco', name: 'Cosmic Disco', phase: 3, bpm: [110, 122], desc: 'Space-age arpeggios processing through tape delays and warm bass pads.' },
+  { code: 'italo-groove', name: 'Italo Groove', phase: 3, bpm: [118, 125], desc: 'Bright analog synthesizers performing uplifting retro-future progressions.' },
+  { code: 'nu-soul-club', name: 'Nu-Soul Club', phase: 3, bpm: [95, 115], desc: 'Silky chord structures layered over broken soul beat patterns.' },
+  { code: 'synthwave-london', name: 'London Synthwave', phase: 3, bpm: [90, 112], desc: 'Cinematic night-driving music capturing retro 80s aesthetics.' },
+  { code: 'jazzy-broken', name: 'Jazzy Broken Beat', phase: 3, bpm: [110, 125], desc: 'Complex syncopated drum patterns supporting live Fender Rhodes structures.' },
+
+  { code: 'ambient-drone', name: 'Ambient Drone', phase: 4, bpm: [60, 80], desc: 'Continuous texture fields removing rhythm entirely for pure sound submersion.' },
+  { code: 'trip-hop', name: 'Bristol Trip-Hop', phase: 4, bpm: [70, 100], desc: 'Slow smoky jazz breaks layered with heavy vinyl crackle and dub bass loops.' },
+  { code: 'lofi-beats', name: 'Lo-Fi Study Beats', phase: 4, bpm: [70, 90], desc: 'Nostalgic, dusty tape-saturated chords drifting over relaxed rhythms.' },
+  { code: 'downtempo-chilled', name: 'Downtempo Chill', phase: 4, bpm: [80, 105], desc: 'Beautiful acoustic elements drifting over relaxed, organic arrangements.' },
+  { code: 'dub-ambient', name: 'Ambient Dub', phase: 4, bpm: [60, 90], desc: 'Massive cavernous tape echoes filtering through structural sub-bass fields.' },
+  { code: 'vaporwave', name: 'Vaporwave', phase: 4, bpm: [60, 100], desc: 'Slowed down consumer aesthetics paired with nostalgic shopping mall acoustics.' },
+  { code: 'cinematic-chill', name: 'Cinematic Chill', phase: 4, bpm: [70, 95], desc: 'Vast orchestral elements blending into quiet synthetic sound environments.' },
+  { code: 'illbient', name: 'Illbient', phase: 4, bpm: [60, 90], desc: 'Gritty, dark ambient textures tracking alongside distorted street grooves.' },
+  { code: 'glitch-hop', name: 'Glitch Hop', phase: 4, bpm: [90, 110], desc: 'Slipped micro-timing cuts mapping over heavy experimental structures.' },
+  { code: 'space-music', name: 'Deep Space Drone', phase: 4, bpm: [60, 80], desc: 'Subterranean synth frequencies charting vast cosmic expansion echoes.' },
+  { code: 'minimal-ambient', name: 'Minimal Ambient', phase: 4, bpm: [60, 85], desc: 'Isolated piano single-notes decaying into quiet electronic noise floors.' },
+  { code: 'psydub', name: 'Psydub World', phase: 4, bpm: [80, 110], desc: 'Evolving algorithmic filters sweeping across foundational global roots.' },
 ];
 
+const history: Array<Record<string, unknown>> = [];
+const vibeLinks = new Map<string, Record<string, unknown>>();
+
+function createTrackId() {
+  return `dbx-${Math.random().toString(36).slice(2, 9)}`;
+}
+
+function generateWaveform(size = 64) {
+  return Array.from({ length: size }, () => Math.random() * 0.8 + 0.2);
+}
+
+function selectGenre(phase: number, genreCode?: string) {
+  return (
+    GENRES_MATRIX.find((genre) => genre.code === genreCode) ||
+    GENRES_MATRIX.find((genre) => genre.phase === phase) ||
+    GENRES_MATRIX[0]
+  );
+}
+
+function selectPhase(phase: number) {
+  return PHASES_DATA.find((item) => item.code === phase) || PHASES_DATA[0];
+}
+
+function createTrackMetadata(phaseCode: number, atmosphere: string, genre: GenreData, phase: PhaseData) {
+  const bpm = Math.floor((phase.bpm_range[0] + phase.bpm_range[1]) / 2);
+  return {
+    name: `${genre.name} - ${atmosphere.toUpperCase()} CUT`,
+    track_id: createTrackId(),
+    phase: phase.code,
+    atmosphere,
+    bpm,
+    processing_tier: 'lyria-pro-hq',
+    cost_per_hour: '0.045',
+    duration_s: 45,
+    created_at: new Date().toISOString(),
+    waveform: generateWaveform(),
+    seed: {
+      phase: phaseCode,
+      atmosphere,
+      bpm,
+      genre_code: genre.code,
+      random_state: Math.floor(Math.random() * 999999),
+    },
+    genre: {
+      name: genre.name,
+      code: genre.code,
+      phase: genre.phase,
+      bpm: genre.bpm,
+    },
+  };
+}
+
 app.use(express.json({ limit: '1mb' }));
-app.use(express.static(path.join(__dirname, 'public')));
+
+const clientBuildDir = path.join(__dirname, 'client', 'build');
+const publicDir = path.join(__dirname, 'public');
+app.use(express.static(fs.existsSync(clientBuildDir) ? clientBuildDir : publicDir));
 
 app.get('/health', (_req, res) => {
   res.json({ status: 'ok', project: 'The DukeBox of London' });
 });
 
 app.get('/api/phases', (_req, res) => {
-  res.json(PHASES);
+  res.json(PHASES_DATA);
 });
 
 app.get('/api/genres', (req, res) => {
   const phase = req.query.phase ? Number(req.query.phase) : null;
-  res.json(phase ? GENRES.filter((genre) => genre.phase === phase) : GENRES);
+  res.json(phase ? GENRES_MATRIX.filter((genre) => genre.phase === phase) : GENRES_MATRIX);
 });
 
 app.get('/api/genres/:code', (req, res) => {
-  const genre = GENRES.find((item) => item.code.toLowerCase() === req.params.code.toLowerCase());
+  const genre = GENRES_MATRIX.find((item) => item.code.toLowerCase() === req.params.code.toLowerCase());
   if (!genre) {
     res.status(404).json({ error: 'Genre not found' });
     return;
@@ -130,37 +197,86 @@ app.get('/api/genres/:code', (req, res) => {
 });
 
 app.get('/api/stats', (_req, res) => {
+  const loved = history.filter((track) => track.loved).length;
+  const pinned = history.filter((track) => track.pinned).length;
   res.json({
-    total_tracks: 0,
-    loved: 0,
-    pinned: 0,
-    phase_counts: { 1: 0, 2: 0, 3: 0, 4: 0 },
-    session_cost: 0,
+    total_tracks: history.length,
+    loved,
+    pinned,
+    phase_counts: {
+      1: history.filter((track) => track.phase === 1).length,
+      2: history.filter((track) => track.phase === 2).length,
+      3: history.filter((track) => track.phase === 3).length,
+      4: history.filter((track) => track.phase === 4).length,
+    },
+    session_cost: Number((history.length * 0.045).toFixed(4)),
   });
 });
 
+app.get('/api/history', (req, res) => {
+  const limit = req.query.limit ? Number(req.query.limit) : 50;
+  res.json(history.slice(-limit).reverse());
+});
+
+app.post('/api/history/action', (req, res) => {
+  const { track_id, action } = req.body ?? {};
+  const track = history.find((item) => item.track_id === track_id);
+  if (track) {
+    if (action === 'love') track.loved = true;
+    if (action === 'pin') track.pinned = true;
+    if (action === 'dislike') track.disliked = true;
+  }
+  res.json({ status: 'ok', action, track_id });
+});
+
+app.post('/api/vibe-link', (req, res) => {
+  const code = Math.random().toString(36).slice(2, 8).toUpperCase();
+  vibeLinks.set(code, { ...req.body, code, created_at: new Date().toISOString(), opens: 0 });
+  res.json({ code, url: `/?vibe=${code}` });
+});
+
+app.get('/api/vibe-link/:code', (req, res) => {
+  const code = req.params.code.toUpperCase();
+  const link = vibeLinks.get(code);
+  if (!link) {
+    res.status(404).json({ error: 'Vibe link not found' });
+    return;
+  }
+  link.opens = Number(link.opens || 0) + 1;
+  res.json(link);
+});
+
 app.post('/api/conduct', async (req, res) => {
-  const { phase, atmosphere, artistSeed } = req.body ?? {};
+  const { phase, atmosphere, genre_code } = req.body ?? {};
+  const phaseCode = Number(phase) || 1;
+  const targetPhase = selectPhase(phaseCode);
+  const targetGenre = selectGenre(targetPhase.code, genre_code);
+  const targetAtmosphere = atmosphere || 'balanced';
+  const trackMetadata = createTrackMetadata(targetPhase.code, targetAtmosphere, targetGenre, targetPhase);
 
   if (!ai) {
     res.status(503).json({
       error: 'GEMINI_API_KEY is not configured.',
       message: 'Set GEMINI_API_KEY in cPanel Node.js environment variables.',
+      previewTrack: trackMetadata,
     });
     return;
   }
 
   try {
-    const prompt = [
-      `Generate a ${phase || 'main-floor'} electronic track.`,
-      `Atmosphere: ${atmosphere || 'warehouse pulse'}.`,
-      `Artist seed: ${artistSeed || 'London club lineage'}.`,
-      'Style: London warehouse, DJ-friendly transitions, detailed low end.',
-    ].join(' ');
+    const architecturalBrief = [
+      'You are a legendary London audio producer running an underground pirate radio station from an abandoned warehouse.',
+      'Generate a fully rendered, production-grade electronic music track matching this specification:',
+      `Music genre architecture: ${targetGenre.name}. Identity: ${targetGenre.desc}`,
+      `Energy profile: Phase ${targetPhase.code} (${targetPhase.name}). Characteristics: ${targetPhase.vibe}. ${targetPhase.description}`,
+      `Atmospheric texture field: ${targetAtmosphere}.`,
+      'Engineering rules: heavy sound system weight, professional sub-bass balance, crisp transient definition, authentic British club culture mixing lineage, perfect loops, non-clipping transitions, and wide high-end stereo fields.',
+      'Output requirement: return a rich audio rendering context matching this aesthetic profile.',
+    ].join('\n');
 
     const result = await ai.models.generateContent({
       model: 'lyria-3-pro-preview',
-      contents: [{ role: 'user', parts: [{ text: prompt }] }],
+      contents: [{ role: 'user', parts: [{ text: architecturalBrief }] }],
       config: {
         responseModalities: ['AUDIO', 'TEXT'],
         responseMimeType: 'audio/wav',
@@ -179,10 +295,13 @@ app.post('/api/conduct', async (req, res) => {
       return;
     }
 
-    res.json({
+    const track = {
+      ...trackMetadata,
       audioData: audioPart.inlineData,
       lyrics: textPart?.text ?? 'Instrumental stream generated.',
-    });
+    };
+    history.push(track);
+    res.json(track);
   } catch (error) {
     console.error('Conduct endpoint failed:', error);
     res.status(500).json({
@@ -196,7 +315,7 @@ app.use('/api', (_req, res) => {
 });
 
 app.get('*', (_req, res) => {
-  res.sendFile(path.join(__dirname, 'public', 'index.html'));
+  res.sendFile(path.join(fs.existsSync(clientBuildDir) ? clientBuildDir : publicDir, 'index.html'));
 });
 
 if (require.main === module) {
