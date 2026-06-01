@@ -98,23 +98,23 @@ body {
 
 /* --- Hardware Panel --- */
 .hardware-panel {
-  background: var(--skin-panel-bg);
-  border: 1px solid var(--skin-border);
-  box-shadow: inset 0 1px 0 rgba(255,255,255,0.03);
-  transition: background 0.5s ease, border-color 0.5s ease;
+  background: linear-gradient(135deg, #16161B 0%, #0A0A0F 100%);
+  border: 2px solid var(--skin-border);
+  border-top: 2px solid #2A2A35;
+  border-radius: 12px;
+  box-shadow: inset 0 2px 0 rgba(255,255,255,0.02), 0 15px 35px rgba(0,0,0,0.8);
   position: relative;
 }
 
-/* Auto-apply subtle grain to hardware panels */
+/* Heavy cassette grain + CRT Scanlines */
 .hardware-panel::before {
   content: '';
   position: absolute; inset: 0;
   border-radius: inherit;
-  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.03'/%3E%3C/svg%3E");
-  background-repeat: repeat;
-  background-size: 200px 200px;
-  opacity: 0.5;
-  mix-blend-mode: overlay;
+  background-image: 
+    repeating-linear-gradient(0deg, transparent, transparent 2px, rgba(0,0,0,0.15) 2px, rgba(0,0,0,0.15) 4px),
+    url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.08'/%3E%3C/svg%3E");
+  mix-blend-mode: multiply;
   pointer-events: none;
   z-index: 0;
 }
