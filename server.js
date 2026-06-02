@@ -270,7 +270,7 @@ app.post('/api/conduct', async (req, res) => {
 app.use('/api', (_req, res) => {
     res.status(404).json({ error: 'API route not found' });
 });
-app.get('*', (_req, res) => {
+app.get(/.*/, (_req, res) => {
     res.sendFile(node_path_1.default.join(fs_1.default.existsSync(clientBuildDir) ? clientBuildDir : publicDir, 'index.html'));
 });
 if (require.main === module) {
