@@ -40,8 +40,25 @@
 - Normalized the Phase 1 default BPM back inside its allowed range so the initial slider state stays valid.
 - Added a fresh DukeBox-specific `.cpanel.yml` so cPanel Git Version Control can deploy `main`, install production dependencies, and restart Passenger without relying on Terminal access.
 
+### 2026-06-01
+
+- **cPanel deployment:** Pushed the latest code to `origin/main` and deployed to the live cPanel Node.js app at `/home/appjbaic/repositories/The-DukeBox-of-London`.
+- **Server startup fix:** Resolved `EADDRINUSE` on port 3000 by killing stale Node/Passenger workers via `/proc/net/tcp` inode scan (Python script with fallback to `pkill -9 node`).
+- **CloudLinux NodeJS Selector compliance:** Removed physical `node_modules/` folder from app root and restored the required symlink → `nodevenv/repositories/The-DukeBox-of-London/22/lib/node_modules`.
+- **path-to-regexp v8 compatibility fix:** Patched `server.js` catch-all route from `app.get("*", ...)` to `app.get(/.*/, ...)` to prevent `PathError: Missing parameter name at index 1: *` crash on Node.js v22.
+- **Lazy GenAI initialization:** Wrapped Google AI client in `getAI()` lazy loader so the app boots cleanly even without `GEMINI_API_KEY` (returns 503 for `/api/conduct` until key is set).
+- **UI upgrades — retro analog aesthetic:**
+  - `client/src/App.css`: Replaced thin circular range sliders with chunky rectangular mixer faders with glowing LED tips (`border-top` glow + `repeating-conic-gradient` cassette texture).
+  - `client/src/components/Knob.js`: Replaced flat circular knobs with ridged cassette-dial style (`repeating-conic-gradient` outer ridges, inner metallic dome, LED indicator line).
+  - `client/src/index.css`: Replaced subtle grain with heavy CRT scanlines + brushed metal gradient on `.hardware-panel`.
+- **React build deployment:** Built `client/` with `npm run build` and synced output to `public/` so Passenger serves the latest frontend.
+- **cPanel deployment workflow:** Updated `.cpanel.yml` to install production node modules and build the React client during deploy.
+- **Dynamic port handling:** Confirmed `server.js` uses `process.env.PORT || 3000` so cPanel can assign the runtime port without hardcoding `3000` in production.
+- **Final push:** Commits `10296c3` and `e395987` pushed to `origin/main`; live domain `https://app.jb3ai.com/` should reflect the new UI after Passenger restart.
+
 ## Open Notes
 
 - Confirm whether API compatibility matters before changing endpoint paths. Current endpoints such as `/api/conduct`, `/api/history`, and `/api/vibe-link` do not expose the old brand.
 - The old `.github/workflows/deploy.yml` and `.cpanel.yml` were not imported because they hardcode the previous `jukebox-london` production path. Create fresh DukeBox deployment wiring once the cPanel/GitHub deployment target is confirmed.
 - Confirm the exact cPanel clone folder. The working assumption is `/home/appjbaic/repositories/The-DukeBox-of-London`, but cPanel may choose a different directory name if the repo was cloned manually.
+- `GEMINI_API_KEY` must be set in cPanel Node.js environment variables for `/api/conduct` to return AI-generated tracks.
