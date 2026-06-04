@@ -4,10 +4,21 @@ import fs from 'fs';
 import dotenv from 'dotenv';
 import { GoogleGenAI } from '@google/genai';
 
+declare const PhusionPassenger:
+  | {
+      configure: (options: { autoInstall: boolean }) => void;
+    }
+  | undefined;
+
 dotenv.config();
 
 const port = process.env.PORT || 3000;
 const apiKey = process.env.GEMINI_API_KEY;
+const isPassenger = typeof PhusionPassenger !== 'undefined' || Boolean(process.env.IN_PASSENGER);
+
+if (typeof PhusionPassenger !== 'undefined') {
+  PhusionPassenger.configure({ autoInstall: false });
+}
 
 const ai = apiKey ? new GoogleGenAI({ apiKey }) : null;
 const app = express();
@@ -318,9 +329,11 @@ app.get(/.*/, (_req, res) => {
   res.sendFile(path.join(fs.existsSync(clientBuildDir) ? clientBuildDir : publicDir, 'index.html'));
 });
 
-if (require.main === module) {
-  app.listen(port, () => {
-    console.log(`DukeBox Node.js server live on port ${port}`);
+if (isPassenger || require.main === module) {
+  const listenTarget = isPassenger ? 'passenger' : port;
+
+  app.listen(listenTarget, () => {
+    console.log(`DukeBox Node.js server live on ${isPassenger ? 'Passenger socket' : `port ${port}`}`);
   });
 }
 

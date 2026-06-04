@@ -10,6 +10,10 @@ const genai_1 = require("@google/genai");
 dotenv_1.default.config();
 const port = process.env.PORT || 3000;
 const apiKey = process.env.GEMINI_API_KEY;
+const isPassenger = typeof PhusionPassenger !== 'undefined' || Boolean(process.env.IN_PASSENGER);
+if (typeof PhusionPassenger !== 'undefined') {
+    PhusionPassenger.configure({ autoInstall: false });
+}
 const ai = apiKey ? new genai_1.GoogleGenAI({ apiKey }) : null;
 const app = (0, express_1.default)();
 const PHASES_DATA = [
@@ -273,9 +277,10 @@ app.use('/api', (_req, res) => {
 app.get(/.*/, (_req, res) => {
     res.sendFile(node_path_1.default.join(fs_1.default.existsSync(clientBuildDir) ? clientBuildDir : publicDir, 'index.html'));
 });
-if (require.main === module) {
-    app.listen(port, () => {
-        console.log(`DukeBox Node.js server live on port ${port}`);
+if (isPassenger || require.main === module) {
+    const listenTarget = isPassenger ? 'passenger' : port;
+    app.listen(listenTarget, () => {
+        console.log(`DukeBox Node.js server live on ${isPassenger ? 'Passenger socket' : `port ${port}`}`);
     });
 }
 module.exports = app;
