@@ -85,7 +85,7 @@ function AppShell({ page, setPage, activePhase, setActivePhase, activeSkin, setA
       <header className="sticky top-0 z-50 px-6 py-3 flex items-center justify-between" style={{ background: `${t.bg}CC`, backdropFilter: 'blur(24px)', borderBottom: `1px solid ${t.border}`, transition: 'background 0.5s ease' }}>
         <div className="flex items-center gap-3">
           <motion.div className="w-2 h-2 rounded-full" style={{ background: t.accent, boxShadow: `0 0 8px ${t.glow}` }} animate={{ scale: [1, 1.3, 1] }} transition={{ duration: 2, repeat: Infinity }} />
-          <span className="font-display text-lg tracking-tighter" style={{ color: t.accent }}>JUKEBOX</span>
+          <span className="font-display text-lg tracking-tighter" style={{ color: t.accent }}>The DukeBox</span>
           <span className="font-data text-[8px] tracking-[0.2em] hidden md:block" style={{ color: t.textMuted }}>LONDON LEGEND EDITION</span>
           {autoSkin && <span data-testid="auto-skin-badge" className="font-data text-[7px] tracking-wider px-2 py-0.5 rounded-full hidden md:block" style={{ background: `${t.accent}15`, color: t.accent, border: `1px solid ${t.accent}30` }}>AUTO</span>}
         </div>

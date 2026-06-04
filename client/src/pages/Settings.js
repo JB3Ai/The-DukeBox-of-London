@@ -246,19 +246,23 @@ export default function Settings({ activeSkin, setActiveSkin, autoSkin, setAutoS
         {/* About */}
         <motion.div className="glass-card rounded-xl p-6" initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.4 }}>
           <h2 className="font-display text-xl tracking-tight mb-4" style={{ color: t.text }}>ABOUT</h2>
-          <div className="space-y-2">
-            {[
-              { l: 'Version', v: '1.0.0 — London Legend Edition' },
-              { l: 'AI Engine', v: 'Producer.ai / Lyria 3' },
-              { l: 'Audio', v: 'Web Audio API Synthesizer' },
-              { l: 'Design Standard', v: 'Apple HIG 2026' },
-              { l: 'Principal Architect', v: 'Jonathan Blackburn' },
-            ].map(r => (
-              <div key={r.l} className="flex justify-between">
-                <span className="font-ui text-sm" style={{ color: t.textMuted }}>{r.l}</span>
-                <span className="font-data text-sm" style={{ color: t.textSecondary }}>{r.v}</span>
-              </div>
-            ))}
+          <div className="mt-8 border-t border-black/20 dark:border-white/10 pt-6 text-[10px] font-mono tracking-wider text-gray-500 uppercase space-y-1.5">
+            <div>
+              <span className="text-gray-400 font-bold">Version:</span> 1.9.9 — London Legend Edition
+            </div>
+            <div>
+              <span className="text-gray-400 font-bold">AI Engine:</span> Google Producer.ai / Google Lyria 3
+            </div>
+            <div>
+              <span className="text-gray-400 font-bold">Audio:</span> Web Audio API Synthesizer
+            </div>
+            <div>
+              <span className="text-gray-400 font-bold">Design Standard:</span> Apple HIG 2026
+            </div>
+            <div className="pt-2 text-[11px] normal-case tracking-normal border-t border-black/5 dark:border-white/5 mt-2">
+              <span className="text-gray-400 font-bold block text-[9px] uppercase tracking-widest mb-0.5">Principal Architect</span>
+              <span className="font-sans font-medium text-gray-300">Jono Blackburn</span>
+            </div>
           </div>
         </motion.div>
       </div>
