@@ -243,7 +243,6 @@ app.post('/api/conduct', async (req, res) => {
             contents: [{ role: 'user', parts: [{ text: architecturalBrief }] }],
             config: {
                 responseModalities: ['AUDIO', 'TEXT'],
-                responseMimeType: 'audio/wav',
             },
         });
         const candidate = result.candidates?.[0];
