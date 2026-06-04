@@ -89,7 +89,7 @@ export default function Hero({ onEnter }) {
             animate={loaded ? { opacity: 1, y: 0, letterSpacing: '-0.02em' } : {}}
             transition={{ duration: 1.2, delay: 0.5, ease: [0.16, 1, 0.3, 1] }}
           >
-            JUKEBOX
+            THE DUKEBOX
           </motion.h1>
 
           {/* Subtitle */}
