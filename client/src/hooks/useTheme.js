@@ -28,8 +28,8 @@ export function ThemeProvider({ skinKey, phaseCode, children }) {
     root.style.setProperty('--skin-viz-bg', theme.vizBg);
     root.style.setProperty('--skin-scroll-track', theme.scrollTrack);
     root.style.setProperty('--skin-scroll-thumb', theme.scrollThumb);
-    // For the shimmer edge
-    root.style.setProperty('--phase-color', theme.shimmerColor || theme.accent);
+    const phaseToken = theme.phaseToken || 'var(--transit-neon-red)';
+    root.style.setProperty('--phase-color', phaseToken);
 
     // Body-level colors
     document.body.style.background = theme.bg;

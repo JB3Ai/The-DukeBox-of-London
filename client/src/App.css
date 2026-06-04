@@ -9,6 +9,7 @@ input[type="range"] {
   border: 1px solid #1E1E24;
   box-shadow: inset 0 2px 4px rgba(0,0,0,0.9);
   outline: none;
+  transition: var(--dukebox-backlight-transition);
 }
 
 input[type="range"]::-webkit-slider-thumb {
@@ -21,7 +22,7 @@ input[type="range"]::-webkit-slider-thumb {
   border: 1px solid #000;
   border-top: 3px solid var(--phase-color, #00E6F2);
   box-shadow: 0 4px 6px rgba(0,0,0,0.8), 0 -2px 12px var(--phase-color, rgba(0, 230, 242, 0.4));
-  transition: box-shadow 0.2s ease, transform 0.1s ease;
+  transition: border-color 0.65s var(--dukebox-neon-ease), box-shadow 0.65s var(--dukebox-neon-ease), transform 0.1s ease;
 }
 
 input[type="range"]::-webkit-slider-thumb:hover {

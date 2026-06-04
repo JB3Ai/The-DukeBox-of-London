@@ -78,11 +78,11 @@ function AppShell({ page, setPage, activePhase, setActivePhase, activeSkin, setA
   }, [setShareTrack]);
 
   return (
-    <div className="min-h-screen relative" style={{ background: t.bg, color: t.text, transition: 'background 0.5s ease, color 0.5s ease' }}>
+    <div className="min-h-screen relative layout-color-shift" style={{ background: t.bg, color: t.text }}>
       <div className="shimmer-edge" />
       <div className="texture-grain-subtle fixed inset-0 pointer-events-none z-[1]" />
 
-      <header className="sticky top-0 z-50 px-6 py-3 flex items-center justify-between" style={{ background: `${t.bg}CC`, backdropFilter: 'blur(24px)', borderBottom: `1px solid ${t.border}`, transition: 'background 0.5s ease' }}>
+      <header className="sticky top-0 z-50 px-6 py-3 flex items-center justify-between layout-color-shift" style={{ background: `${t.bg}CC`, backdropFilter: 'blur(24px)', borderBottom: `1px solid ${t.border}` }}>
         <div className="flex items-center gap-3">
           <motion.div className="w-2 h-2 rounded-full" style={{ background: t.accent, boxShadow: `0 0 8px ${t.glow}` }} animate={{ scale: [1, 1.3, 1] }} transition={{ duration: 2, repeat: Infinity }} />
           <span className="font-display text-lg tracking-tighter" style={{ color: t.accent }}>The DukeBox</span>

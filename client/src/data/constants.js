@@ -2,10 +2,10 @@
 // Each skin defines every color token the UI needs
 
 export const PHASE_COLORS = {
-  1: { accent: '#EA00F2', bg: '#0A0A0F', name: 'PEAK-BASS', glow: 'rgba(234,0,242,0.3)' },
-  2: { accent: '#00E6F2', bg: '#0A0A0F', name: 'MAIN-FLOOR', glow: 'rgba(0,230,242,0.3)' },
-  3: { accent: '#A7C7E7', bg: '#0F0F1A', name: 'SUNRISE', glow: 'rgba(167,199,231,0.3)' },
-  4: { accent: '#E9967A', bg: '#1A1610', name: 'ZONED-OUT', glow: 'rgba(233,150,122,0.3)' },
+  1: { accent: '#FF1800', bg: '#0A0A0F', name: 'PEAK-BASS', glow: 'rgba(255,24,0,0.32)', transitToken: 'var(--transit-neon-red)' },
+  2: { accent: '#00D0FF', bg: '#0A0A0F', name: 'MAIN-FLOOR', glow: 'rgba(0,208,255,0.32)', transitToken: 'var(--transit-neon-blue)' },
+  3: { accent: '#00FF55', bg: '#0F0F1A', name: 'SUNRISE', glow: 'rgba(0,255,85,0.32)', transitToken: 'var(--transit-neon-green)' },
+  4: { accent: '#FF7700', bg: '#1A1610', name: 'ZONED-OUT', glow: 'rgba(255,119,0,0.32)', transitToken: 'var(--transit-neon-amber)' },
 };
 
 export const SKINS = {
@@ -156,6 +156,7 @@ export function getTheme(skinKey, phaseCode) {
     bg,
     phaseName: phase.name,
     phaseCode,
+    phaseToken: phase.transitToken,
     skinKey,
   };
 }

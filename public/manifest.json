@@ -1,0 +1,8 @@
+{
+  "short_name": "The DukeBox",
+  "name": "The DukeBox of London — Legend Edition",
+  "start_url": ".",
+  "display": "standalone",
+  "theme_color": "#0A0A0F",
+  "background_color": "#0A0A0F"
+}

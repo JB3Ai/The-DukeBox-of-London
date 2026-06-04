@@ -18,7 +18,7 @@ export default function Dashboard({ activePhase, setActivePhase, onConduct, onNa
   const phaseInfo = phases.find(p => p.code === activePhase) || {};
 
   return (
-    <div data-testid="dashboard-page" className="relative min-h-screen px-6 py-8">
+    <div data-testid="dashboard-page" className="relative min-h-screen px-6 py-8 layout-color-shift">
       <motion.div
         className="fixed inset-0 pointer-events-none"
         animate={{ background: `radial-gradient(ellipse at 50% 30%, ${t.accent}05 0%, transparent 60%)` }}
@@ -28,7 +28,7 @@ export default function Dashboard({ activePhase, setActivePhase, onConduct, onNa
       <div className="relative z-10 max-w-5xl mx-auto">
         <motion.div className="text-center mb-12" initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }}>
           <h1 className="font-display text-5xl md:text-7xl tracking-tighter" style={{ color: t.accent }}>
-            JUKEBOX
+            THE DUKEBOX
           </h1>
           <p className="font-data text-[10px] tracking-[0.3em] mt-2" style={{ color: t.textMuted }}>
             LONDON LEGEND EDITION
