@@ -28,7 +28,7 @@
   --skin-viz-bg: rgba(10,10,15,0.2);
   --skin-scroll-track: #0A0A0F;
   --skin-scroll-thumb: #1E1E24;
-  --phase-color: #EA00F2;
+  --phase-color: var(--transit-neon-red);
 }
 
 * { margin: 0; padding: 0; box-sizing: border-box; }
