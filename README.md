@@ -1,4 +1,22 @@
+<div align="center">
+
 # The DukeBox of London
+
+### A generative music experience shaped by London underground culture and interactive design.
+
+[![JB3](https://img.shields.io/badge/JB%C2%B3-jb3ai.com-22324A?style=for-the-badge)](https://jb3ai.com)
+![Status](https://img.shields.io/badge/STATUS-LIVE_PROTOTYPE-F2A900?style=for-the-badge)
+[![Profile](https://img.shields.io/badge/FOUNDER-JONATHAN_BLACKBURN-6C63FF?style=for-the-badge)](https://github.com/JB3Ai)
+
+</div>
+
+---
+
+## Overview
+
+The DukeBox of London is an AI music conductor with a London warehouse and underground-club identity. Each generation creates a fresh listening experience from the selected phase, atmosphere, tempo and genre direction, then presents it through a reactive visualiser and tactile cassette-deck interface.
+
+**Live prototype:** [app.jb3ai.com](https://app.jb3ai.com/)
 
 A London-warehouse-themed AI music conductor. One tap generates a full electronic track, streams it back with a real-time visualizer, parametric EQ, and a cassette-deck aesthetic.
 
@@ -107,10 +125,37 @@ npm run build
 └── DUKEBOX_PROGRESS_NOTES.md
 ```
 
+
+## Current Status
+
+- Live prototype available at [app.jb3ai.com](https://app.jb3ai.com/)
+- Production AI generation requires the configured model credentials
+- Audio generation, decoding and visual synchronisation should be verified after each provider or deployment change
+- Generated output remains subject to the selected model provider's availability, terms and safety controls
+
 ---
 
-## Status
+## Support the Build
 
-- 🟢 **Live** at `https://app.jb3ai.com/`
-- 🟡 **Pending:** Set `GEMINI_API_KEY` in cPanel env to enable AI track generation
-- 🟡 **Pending:** Verify full audio pipeline (Lyria decoder + visualiser sync) end-to-end on live domain
+JB³ develops practical AI and public-impact technology from Pretoria, South Africa. Sponsorship helps fund development time, model access, infrastructure, testing equipment and the path from prototype to reliable release.
+
+<div align="center">
+
+[![PayBru](https://img.shields.io/badge/PAYBRU-BECOME_A_FOUNDING_SPONSOR-00A9A5?style=for-the-badge)](https://paybru.co.za/communities/jonoblackburn-become-a-founding-sponsor)
+[![Ko-fi](https://img.shields.io/badge/KO--FI-SUPPORT_THE_BUILD-FF5E5B?style=for-the-badge)](https://ko-fi.com/D0K721OP8E)
+[![PayPal](https://img.shields.io/badge/PAYPAL-SPONSOR_VIA_PAYPAL-003087?style=for-the-badge)](https://paypal.me/jonoblackburnza)
+[![Buy Me a Coffee](https://img.shields.io/badge/BUY_ME_A_COFFEE-SUPPORT_JB%C2%B3-FFDD00?style=for-the-badge&logoColor=000000)](https://buymeacoffee.com/jb3ai)
+
+</div>
+
+> Sponsorship supports development. It does not purchase equity, ownership, influence over investigative outputs or preferential access to sensitive information.
+
+**[Explore JB³](https://jb3ai.com)** · **[Meet Jonathan Blackburn](https://www.jonoblackburn.com)** · **[Book a conversation](https://jb3ai.com/book)** · **[Email](mailto:jono@jb3ai.com)**
+
+<div align="center">
+
+**Part of the JB³ / OS³ ecosystem**
+
+*Fall. Rise. Rebuild. Evolve.*
+
+</div>
