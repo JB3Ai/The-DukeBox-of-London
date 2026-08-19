@@ -38,7 +38,7 @@ jobs:
             echo "Starting continuous deployment workflow..."
 
             # Navigate straight to your canonical repository path
-            cd /home/${{ secrets.DEPLOY_USER }}/repositories/The-DukeBox-of-London
+            cd /home/appjbaic/repositories/The-DukeBox-of-London
 
             # Fetch the latest structural commits from main securely
             git fetch origin main
