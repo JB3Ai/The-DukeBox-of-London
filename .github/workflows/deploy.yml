@@ -40,8 +40,16 @@ jobs:
             # Navigate straight to your canonical repository path
             cd /home/appjbaic/repositories/The-DukeBox-of-London
 
+            # Bootstrap Git metadata when the directory exists but is not a Git working tree
+            if [ ! -d .git ]; then
+              echo "No .git directory found. Initializing repository metadata..."
+              git init
+              git remote add origin ${{ github.server_url }}/${{ github.repository }}.git
+            fi
+
             # Fetch the latest structural commits from main securely
             git fetch origin main
+            git checkout -B main origin/main
             git reset --hard origin/main
 
             # Install full dependencies so the TypeScript compiler is available
